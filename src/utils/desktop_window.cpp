@@ -29,9 +29,9 @@ namespace utils
 
 	void desktop_window::spawn_worker()
 	{
-		size_t result;
-		HWND window = FindWindowW(L"Progman", nullptr);
-		SendMessageTimeoutW(window, 0x052c, 0, 0, SMTO_BLOCK, 1000, PDWORD_PTR(&result));
+		DWORD_PTR result;
+		HWND window = FindWindowA("Progman", nullptr);
+		SendMessageTimeoutA(window, 0x052c, 0, 0, SMTO_BLOCK, 1000, &result);
 	}
 
 	void desktop_window::locate_worker()
@@ -40,10 +40,10 @@ namespace utils
 
 		for (auto window : windows)
 		{
-			HWND def_view = FindWindowExW(window, nullptr, L"SHELLDLL_DefView", nullptr);
+			HWND def_view = FindWindowExA(window, nullptr, "SHELLDLL_DefView", nullptr);
 			if (def_view)
 			{
-				this->worker = FindWindowExW(nullptr, window, L"WorkerW", nullptr);
+				this->worker = FindWindowExA(nullptr, window, "WorkerW", nullptr);
 				this->hide();
 				return;
 			}
