@@ -4,13 +4,16 @@
 
 #include "cef/cef_ui.hpp"
 
-#include "utils/library.hpp"
 #include "utils/system_tray.hpp"
 #include "utils/desktop_window.hpp"
 
+#include <literally/library.hpp>
+
+using namespace literally;
+
 frame::frame()
 {
-	SetCurrentDirectoryA(utils::dynlib().get_folder().data());
+	SetCurrentDirectoryA(dynlib().get_folder().data());
 }
 
 int frame::run()

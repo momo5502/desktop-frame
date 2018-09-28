@@ -77,7 +77,8 @@ workspace "desktopframe"
 		}
 		
 		includedirs {
-			"src"
+			"src",
+			"deps/literally/include"
 		}
 
 		pchheader "std_include.hpp"

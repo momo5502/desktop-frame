@@ -1,13 +1,16 @@
 #include "std_include.hpp"
 
-#include "utils/library.hpp"
 #include "utils/system_tray.hpp"
+
+#include <literally/library.hpp>
+
+using namespace literally;
 
 namespace utils
 {
 	system_tray::system_tray(std::string _title) : title(_title)
 	{
-		utils::dynlib proc;
+		dynlib proc;
 		this->instance = proc.get_handle();
 
 		this->menu = CreatePopupMenu();

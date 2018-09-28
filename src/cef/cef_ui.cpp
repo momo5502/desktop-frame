@@ -1,10 +1,10 @@
 #include "std_include.hpp"
 
-#include "utils/library.hpp"
-
 #include "cef/cef_ui.hpp"
 #include "cef/cef_ui_app.hpp"
 #include "cef/cef_ui_handler.hpp"
+
+using namespace literally;
 
 namespace cef
 {
@@ -20,7 +20,7 @@ namespace cef
 
 	int cef_ui::run_process()
 	{
-		utils::dynlib proc;
+		dynlib proc;
 		CefMainArgs args(proc.get_handle());
 
 		return CefExecuteProcess(args, nullptr, nullptr);
@@ -30,7 +30,7 @@ namespace cef
 	{
 		if (this->browser) return;
 
-		utils::dynlib proc;
+		dynlib proc;
 		CefMainArgs args(proc.get_handle());
 
 		CefSettings settings;
@@ -97,11 +97,11 @@ namespace cef
 
 	cef_ui::cef_ui()
 	{
-		utils::dynlib self = utils::dynlib::get_by_address(utils::dynlib::get_by_address);
+		dynlib self = dynlib::get_by_address(dynlib::get_by_address);
 		this->path = self.get_folder();
 
-		utils::dynlib::add_load_path(this->path + "cef");
-		utils::dynlib libcef("libcef.dll", true);
+		dynlib::add_load_path(this->path + "cef");
+		dynlib libcef("libcef.dll", true);
 		if (!libcef.is_valid() || !libcef.delay_import())
 		{
 			throw std::runtime_error("Unable to import libcef");

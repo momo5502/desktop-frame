@@ -16,6 +16,8 @@
 
 #pragma warning(pop)
 
+#include <literally/library.hpp>
+
 namespace cef
 {
 	class cef_ui
