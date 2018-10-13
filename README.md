@@ -6,3 +6,4 @@
 
 Desktop Frame
 ===========
+Render HTML websites as Desktop background/wallpaper
