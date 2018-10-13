@@ -7,3 +7,5 @@
 Desktop Frame
 ===========
 Render HTML websites as Desktop background/wallpaper
+
+![demo](https://github.com/momo5502/desktopframe/raw/master/demo.gif)
