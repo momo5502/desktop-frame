@@ -26,6 +26,8 @@ namespace cef
 	{
 		CEF_REQUIRE_UI_THREAD();
 
+		SetParent(browser->GetHost()->GetWindowHandle(), nullptr);
+
 		for (auto bit = this->browser_list.begin(); bit != this->browser_list.end(); ++bit)
 		{
 			if ((*bit)->IsSame(browser))
@@ -67,8 +69,4 @@ namespace cef
 		return false;
 	}
 
-	bool cef_ui_handler::OnProcessMessageReceived(CefRefPtr<CefBrowser> /*browser*/, CefProcessId /*sourceProcess*/, CefRefPtr<CefProcessMessage> /*message*/)
-	{
-		return false;
-	}
 }

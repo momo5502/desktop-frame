@@ -28,7 +28,7 @@ namespace cef
 			return this;
 		}
 
-		virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
+		//virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
 		virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 		virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;

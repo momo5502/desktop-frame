@@ -19,11 +19,11 @@ function cef.includes()
 	filter { "Release", "platforms:*32" }
 		libdirs { path.join(cef.source, "Release/Win32") }
 	filter { "Release", "platforms:*64" }
-		libdirs { path.join(cef.source, "Release/Win64") }
+		libdirs { path.join(cef.source, "Release") }
 	filter { "Debug", "platforms:*32" }
 		libdirs { path.join(cef.source, "Debug/Win32") }
 	filter { "Debug", "platforms:*64" }
-		libdirs { path.join(cef.source, "Debug/Win64") }
+		libdirs { path.join(cef.source, "Debug") }
 
 	filter {}
 end
@@ -42,8 +42,8 @@ function cef.project()
 		postbuildcommands {
 			"mkdir \"%{wks.location}runtime/%{cfg.platform}/%{cfg.buildcfg}/cef/\" 2> nul",
 			"mkdir \"%{wks.location}runtime/%{cfg.platform}/%{cfg.buildcfg}/cef/locales/\" 2> nul",
-			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\%{cfg.platform}\\*.dll\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
-			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\%{cfg.platform}\\*.bin\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.dll\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.bin\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
 			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
 			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.dat\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
 			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\locales\\\"",

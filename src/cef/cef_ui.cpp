@@ -58,16 +58,18 @@ namespace cef
 
 		CefBrowserSettings browser_settings;
 		//browser_settings.windowless_frame_rate = 60;
-		browser_settings.web_security = STATE_DISABLED;
+		//browser_settings.web_security = STATE_DISABLED;
 
 		CefWindowInfo window_info;
-		window_info.width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-		window_info.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-		window_info.x = 0;
-		window_info.y = 0;
+		window_info.SetAsPopup(nullptr, "");
+		window_info.bounds.width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+		window_info.bounds.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+		window_info.bounds.x = 0;
+		window_info.bounds.y = 0;
 		window_info.style = WS_VISIBLE | WS_POPUP;
 
-		this->browser = CefBrowserHost::CreateBrowserSync(window_info, new cef_ui_handler(), url, browser_settings, NULL);
+		this->browser = CefBrowserHost::CreateBrowserSync(window_info, new cef_ui_handler(), url, browser_settings, {},
+		                                                  {});
 	}
 
 	HWND cef_ui::get_window()
@@ -76,7 +78,7 @@ namespace cef
 		return this->browser->GetHost()->GetWindowHandle();
 	}
 
-	void cef_ui::invoke_close_browser(CefRefPtr<CefBrowser> browser)
+	void cef_ui::invoke_close_browser(const CefRefPtr<CefBrowser>& browser)
 	{
 		if (!browser) return;
 		browser->GetHost()->CloseBrowser(true);
@@ -85,7 +87,7 @@ namespace cef
 	void cef_ui::close_browser()
 	{
 		if (!this->browser) return;
-		CefPostTask(TID_UI, base::Bind(&cef_ui::invoke_close_browser, this->browser));
+		CefPostTask(TID_UI, base::BindOnce(&cef_ui::invoke_close_browser, this->browser));
 		this->browser = nullptr;
 	}
 
@@ -107,7 +109,7 @@ namespace cef
 			throw std::runtime_error("Unable to import libcef");
 		}
 
-		CefEnableHighDPISupport();
+		//CefEnableHighDPISupport();
 	}
 
 	cef_ui::~cef_ui()

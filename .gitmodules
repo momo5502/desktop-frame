@@ -1,7 +1,3 @@
-[submodule "deps/cef"]
-	path = deps/cef
-	url = https://git.kthx.at/0x90/cef.git
-	shallow = true
 [submodule "deps/literally"]
 	path = deps/literally
 	url = ../literally.git
