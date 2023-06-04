@@ -1,10 +1,14 @@
 cef = {
+	versionShort = "106.1.0",
+	versionLong = "cef_binary_106.1.0+g30ad805+chromium-106.0.5249.119_windows64",
 	source = "deps/cef"
 }
 
 function cef.import()
-	links { "cef", "cef_sandbox", "libcef" }
+	filter {"kind:not StaticLib" }
+	links { "cef", "cef_sandbox", "libcef", "Dbghelp.lib", "Winmm.lib", "Version.lib", "SetupAPI.lib", "Powrprof.lib", "Propsys.lib" }
 	linkoptions { "/DELAYLOAD:libcef.dll" }
+	filter {}
 	cef.includes()
 end
 
@@ -16,19 +20,44 @@ function cef.includes()
 		"USING_CEF_SHARED",
 	}
 	
-	filter { "Release", "platforms:*32" }
-		libdirs { path.join(cef.source, "Release/Win32") }
-	filter { "Release", "platforms:*64" }
+	filter { "Release" }
 		libdirs { path.join(cef.source, "Release") }
-	filter { "Debug", "platforms:*32" }
-		libdirs { path.join(cef.source, "Debug/Win32") }
-	filter { "Debug", "platforms:*64" }
+	filter { "Debug" }
 		libdirs { path.join(cef.source, "Debug") }
-
 	filter {}
 end
 
+function cef.install()
+	if os.host() == "windows" then
+		local result = os.executef("powershell -c \"Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process; %s %s\"", ".\\scripts\\get-cef.ps1", cef.versionLong)
+		return result == true
+	else
+		premake.error(string.format("Your OS does not support automatic CEF installation.\n"
+			.. "Please download CEF version '%s' yourself and place it in 'deps/cef'.\n"
+			.. "Afterwards create a file 'deps/cef/.launcher_version.txt' with content '%s'.",
+			cef.versionShort, cef.versionShort
+		))
+	end
+	return true
+end
+
+function cef.checkVersion()
+	local versionFile = path.join(cef.source, ".launcher_version.txt")
+	local installedVersion = io.readfile(versionFile)
+
+	if installedVersion ~= cef.versionShort then
+		print("CEF dependency outdated. Attempting to install new version.")
+		if cef.install() then
+			io.writefile(versionFile, cef.versionShort)
+		else
+			premake.error("Failed to install CEF.")
+		end
+	end
+end
+
 function cef.project()
+	cef.checkVersion()
+
 	project "cef"
 		language "C++"
 
@@ -46,11 +75,14 @@ function cef.project()
 			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.bin\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
 			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
 			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.dat\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
-			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\locales\\\"",
+			--"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\locales\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\en-US.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\locales\\\"",
 		}
 
-		linkoptions { "-IGNORE:4221" }
+		linkoptions { "-IGNORE:4221", "-IGNORE:4006" }
 		removelinks "*"
 		warnings "Off"
 		kind "StaticLib"
 end
+
+table.insert(dependencies, cef)

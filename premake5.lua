@@ -1,4 +1,34 @@
-require "deps/premake/cef"
+dependencies = {
+	basePath = "./deps"
+}
+
+function dependencies.load()
+	dir = path.join(dependencies.basePath, "premake/*.lua")
+	deps = os.matchfiles(dir)
+
+	for i, dep in pairs(deps) do
+		dep = dep:gsub(".lua", "")
+		require(dep)
+	end
+end
+
+function dependencies.imports()
+	for i, proj in pairs(dependencies) do
+		if type(i) == 'number' then
+			proj.import()
+		end
+	end
+end
+
+function dependencies.projects()
+	for i, proj in pairs(dependencies) do
+		if type(i) == 'number' then
+			proj.project()
+		end
+	end
+end
+
+dependencies.load()
 
 workspace "desktopframe"
 	configurations { "Debug", "Release" }
@@ -29,30 +59,36 @@ workspace "desktopframe"
 	filter {}
 
 	flags {
-		"StaticRuntime",
 		"NoIncrementalLink",
 		"NoMinimalRebuild",
 		"MultiProcessorCompile",
-		"No64BitChecks",
-		"UndefinedIdentifiers"
+		"No64BitChecks"
 	}
 	
-	largeaddressaware "on"
+	largeaddressaware "on"	
+	systemversion "latest"
+	symbols "On"
+	staticruntime "On"
 	editandcontinue "Off"
 	warnings "Extra"
-	symbols "On"
+	characterset "ASCII"
 
-	configuration "Release*"
-		defines { "NDEBUG" }
-		optimize "On"
-		flags {
-			"FatalCompileWarnings",
-			"FatalLinkWarnings",
-		}
+	filter "platforms:x64"
+		defines {"_WINDOWS", "WIN32"}
+	filter {}
 
-	configuration "Debug*"
-		defines { "DEBUG", "_DEBUG" }
+	filter "configurations:Release"
+		optimize "Size"
+		buildoptions {"/GL"}
+		linkoptions {"/IGNORE:4702", "/LTCG"}
+		defines {"NDEBUG"}
+		flags {"FatalCompileWarnings"}
+	filter {}
+
+	filter "configurations:Debug"
 		optimize "Debug"
+		defines {"DEBUG", "_DEBUG"}
+	filter {}
 	
 	project "desktopframe"
 		kind "WindowedApp"
@@ -84,7 +120,8 @@ workspace "desktopframe"
 		pchheader "std_include.hpp"
 		pchsource "src/std_include.cpp"	
 
-		cef.import()
+		dependencies.imports()
 		
 	group "Dependencies"
-		cef.project()
+		dependencies.projects()
+

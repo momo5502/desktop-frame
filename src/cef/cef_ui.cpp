@@ -4,6 +4,9 @@
 #include "cef/cef_ui_app.hpp"
 #include "cef/cef_ui_handler.hpp"
 
+#pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "Ws2_32.lib")
+
 using namespace literally;
 
 namespace cef
