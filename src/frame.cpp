@@ -24,14 +24,18 @@ int frame::run()
 		if (result >= 0) return result;
 
 		//cef_ui.create("https://earth.plus360degrees.com/");
-		cef_ui.create("https://www.youtube.com/embed/IWVJq-4zW24?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&start=1795");
+		cef_ui.create(
+			"https://www.youtube.com/embed/-mubAzA0X04?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1");
 		//cef_ui.create("file:///C:/Users/mauri/Desktop/test.html");
 	}
+
 
 	utils::desktop_window desktop;
 	{
 		desktop.apply(cef_ui.get_window());
 	}
+
+	MoveWindow(cef_ui.get_window(), 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN), true);
 
 	utils::system_tray tray("Desktop Frame");
 	{
@@ -50,7 +54,7 @@ int frame::run()
 			cef_ui.close_browser();
 		});
 	}
-	
+
 	cef_ui.work();
 	return 0;
 }

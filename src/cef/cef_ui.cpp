@@ -64,7 +64,7 @@ namespace cef
 		//browser_settings.web_security = STATE_DISABLED;
 
 		CefWindowInfo window_info;
-		window_info.SetAsPopup(nullptr, "");
+		window_info.SetAsPopup(nullptr, "DesktopFrame");
 		window_info.bounds.width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
 		window_info.bounds.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 		window_info.bounds.x = 0;
