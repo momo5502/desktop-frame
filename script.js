@@ -9,11 +9,12 @@ function handleSizeChange() {
 
   var scale = landscapeScale >= 1 ? landscapeScale : portraitScale;
   scale = Math.ceil(scale * 10) / 10;
+  scale += 0.1;
 
   console.log(window.innerWidth);
   console.log(window.innerHeight);
   document.body.style.transform = `scale(${scale})`;
-  document.body.style.filter = `saturate(1.5) blur(60px)`;
+  document.body.style.filter = `saturate(1.5) blur(80px)`;
 }
 
 function main() {
