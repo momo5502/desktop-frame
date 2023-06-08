@@ -3,7 +3,7 @@
 namespace cef
 {
 	class cef_ui_handler : public CefClient, public CefDisplayHandler, public CefLifeSpanHandler, public CefLoadHandler,
-	                       public CefContextMenuHandler, CefRequestHandler, CefResourceRequestHandler
+	                       public CefContextMenuHandler, CefRequestHandler
 	{
 	public:
 		explicit cef_ui_handler();

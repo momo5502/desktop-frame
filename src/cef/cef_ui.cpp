@@ -57,7 +57,7 @@ namespace cef
 		CefString(&settings.cache_path) = this->path + "cef_data\\cache";
 		CefString(&settings.locale) = "en-US";
 
-		this->initialized = CefInitialize(args, settings, new cef_ui_app(), 0);
+		this->initialized = CefInitialize(args, settings, new cef_ui_app(), nullptr);
 
 		CefBrowserSettings browser_settings;
 		//browser_settings.windowless_frame_rate = 60;

@@ -47,6 +47,7 @@
         background-color: #222;
         padding: 10px;
         display: flex;
+        justify-content: center;
         align-items: center;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add drop shadow */
       }
@@ -56,13 +57,20 @@
         font-size: 20px;
         font-weight: bold;
         text-decoration: none;
+        margin-right: auto;
+      }
+
+      .navbar-settings {
+        color: #fff;
+        font-size: 20px;
+        margin-left: 10px;
       }
 
       .navbar-search {
-        margin-left: auto;
         text-align: center;
         border-radius: 7px; /* Add rounded corners */
         overflow: hidden; /* Ensure rounded corners are applied */
+        width: 50%;
       }
 
       .search-input {
@@ -71,6 +79,7 @@
         padding: 8px;
         color: #fff;
         border-radius: 7px; /* Reduce border radius */
+        width: 100%;
       }
 
       /* CSS for grid layout */
@@ -177,6 +186,7 @@
           placeholder="Search videos..."
         />
       </div>
+      <div class="navbar-settings">&#9881;</div>
     </nav>
 
     <div class="grid" id="video-grid">
@@ -210,60 +220,45 @@
       // Generate thumbnails dynamically
       function generateThumbnails() {
         var grid = document.getElementById("video-grid");
-        var thumbnailsHTML = "";
-
         for (var i = 0; i < videoData.length; i++) {
-          var videoId = videoData[i].videoId;
-          var thumbnailUrl = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
-          var altText = videoData[i].alt;
-          var videoUrl = `https://www.youtube.com/embed/${videoId}`;
+          var videoContainer = document.createElement("div");
+          videoContainer.className = "video-container";
 
-          var thumbnailHTML = `
-                    <div class="video-container">
-                        <img class="video-thumbnail" src="${thumbnailUrl}" alt="${altText}" data-video-url="${videoUrl}">
-                    </div>
-                `;
+          var thumbnail = document.createElement("img");
+          thumbnail.className = "video-thumbnail";
+          thumbnail.alt = videoData[i].alt;
+          thumbnail.src = "https://img.youtube.com/vi/" + videoData[i].videoId + "/mqdefault.jpg";
+          thumbnail.addEventListener("click", openVideoPopup.bind(null, videoData[i].videoId));
 
-          thumbnailsHTML += thumbnailHTML;
+          videoContainer.appendChild(thumbnail);
+          grid.appendChild(videoContainer);
         }
-
-        grid.innerHTML = thumbnailsHTML;
       }
 
-      // Show video popup
-      function showVideoPopup(videoUrl) {
-        var videoPopup = document.querySelector(".video-popup");
+      // Open video popup
+      function openVideoPopup(videoId) {
         var videoIframe = document.getElementById("video-iframe");
+        videoIframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
 
-        videoIframe.src = videoUrl;
+        var videoPopup = document.querySelector(".video-popup");
         videoPopup.classList.add("active");
       }
 
       // Close video popup
       function closeVideoPopup() {
-        var videoPopup = document.querySelector(".video-popup");
         var videoIframe = document.getElementById("video-iframe");
-
         videoIframe.src = "";
+
+        var videoPopup = document.querySelector(".video-popup");
         videoPopup.classList.remove("active");
       }
 
-      // Event delegation for thumbnail clicks
-      document.addEventListener("click", function (event) {
-        var clickedElement = event.target;
-
-        if (clickedElement.classList.contains("video-thumbnail")) {
-          var videoUrl = clickedElement.getAttribute("data-video-url");
-          showVideoPopup(videoUrl);
-        }
-
-        if (clickedElement.classList.contains("video-popup-close")) {
-          closeVideoPopup();
-        }
-      });
-
       // Generate thumbnails on page load
       generateThumbnails();
+
+      // Close video popup when close button is clicked
+      var videoPopupClose = document.querySelector(".video-popup-close");
+      videoPopupClose.addEventListener("click", closeVideoPopup);
     </script>
   </body>
 </html>
