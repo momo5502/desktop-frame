@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cef_include.h"
+
 namespace cef
 {
 	class cef_ui_app : public CefApp, public CefBrowserProcessHandler

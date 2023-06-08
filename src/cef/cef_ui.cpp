@@ -1,16 +1,84 @@
 #include "std_include.hpp"
 
+#include "utils/nt.hpp"
+
 #include "cef/cef_ui.hpp"
 #include "cef/cef_ui_app.hpp"
-#include "cef/cef_ui_handler.hpp"
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Ws2_32.lib")
-
-using namespace literally;
+#pragma comment(lib, "delayimp.lib")
 
 namespace cef
 {
+	namespace
+	{
+		void delay_load_cef()
+		{
+			static const auto _ = []
+			{
+				const auto self = utils::nt::library::get_by_address(&delay_load_cef);
+				const auto cef_path = self.get_folder() / "cef";
+
+				utils::nt::library::scoped_dll_directory dll_directory{cef_path};
+
+				if (!utils::nt::library::load("libcef.dll"))
+				{
+					throw std::runtime_error("Failed to load CEF");
+				}
+
+				return 0;
+			}();
+			(void)_;
+		}
+
+		CefMainArgs get_cef_main_args()
+		{
+			const utils::nt::library main{};
+			return CefMainArgs(main.get_handle());
+		}
+	}
+
+	cef_ui::cef_ui()
+	{
+		delay_load_cef();
+
+		CefEnableHighDPISupport();
+
+		const auto args = get_cef_main_args();
+
+		CefSettings settings;
+		settings.no_sandbox = TRUE;
+		settings.remote_debugging_port = 12345;
+
+#ifdef DEBUG
+		settings.log_severity = LOGSEVERITY_VERBOSE;
+#else
+		settings.log_severity = LOGSEVERITY_DISABLE;
+#endif
+
+		const utils::nt::library main{};
+		const auto folder = main.get_folder();
+
+		CefString(&settings.browser_subprocess_path) = main.get_path();
+		CefString(&settings.locales_dir_path) = folder / "cef/locales";
+		CefString(&settings.resources_dir_path) = folder / "cef";
+		CefString(&settings.log_file) = folder / "cef_data/debug.log";
+		CefString(&settings.user_data_path) = folder / "cef_data/user";
+		CefString(&settings.cache_path) = folder / "cef_data/cache";
+		CefString(&settings.locale) = "en-US";
+
+		if (!CefInitialize(args, settings, new cef_ui_app(), nullptr))
+		{
+			throw std::runtime_error("Failed to initialize CEF");
+		}
+	}
+
+	cef_ui::~cef_ui()
+	{
+		CefShutdown();
+	}
+
 	void cef_ui::work_once()
 	{
 		CefDoMessageLoopWork();
@@ -21,111 +89,61 @@ namespace cef
 		CefRunMessageLoop();
 	}
 
+	void cef_ui::end_work()
+	{
+		CefQuitMessageLoop();
+	}
+
 	int cef_ui::run_process()
 	{
-		dynlib proc;
-		CefMainArgs args(proc.get_handle());
-
+		const auto args = get_cef_main_args();
 		return CefExecuteProcess(args, nullptr, nullptr);
 	}
 
-	void cef_ui::create(std::string url)
+	void cef_ui::add_browser(CefRefPtr<CefBrowser> browser)
 	{
-		if (this->browser) return;
-
-		dynlib proc;
-		CefMainArgs args(proc.get_handle());
-
-		CefSettings settings;
-		settings.no_sandbox = TRUE;
-		//settings.single_process = TRUE;
-		//settings.windowless_rendering_enabled = TRUE;
-		//settings.pack_loading_disabled = FALSE;
-		settings.remote_debugging_port = 12345;
-
-#ifdef DEBUG
-		settings.log_severity = LOGSEVERITY_VERBOSE;
-#else
-		settings.log_severity = LOGSEVERITY_DISABLE;
-#endif
-
-		CefString(&settings.browser_subprocess_path) = proc.get_path();
-		CefString(&settings.locales_dir_path) = this->path + "cef\\locales";
-		CefString(&settings.resources_dir_path) = this->path + "cef";
-		CefString(&settings.log_file) = this->path + "cef_data\\debug.log";
-		CefString(&settings.user_data_path) = this->path + "cef_data\\user";
-		CefString(&settings.cache_path) = this->path + "cef_data\\cache";
-		CefString(&settings.locale) = "en-US";
-
-		this->initialized = CefInitialize(args, settings, new cef_ui_app(), nullptr);
-
-		CefBrowserSettings browser_settings;
-		//browser_settings.windowless_frame_rate = 60;
-		//browser_settings.web_security = STATE_DISABLED;
-
-		CefWindowInfo window_info;
-		window_info.SetAsPopup(nullptr, "DesktopFrame");
-		window_info.bounds.width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-		window_info.bounds.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-		window_info.bounds.x = 0;
-		window_info.bounds.y = 0;
-		window_info.style = WS_VISIBLE | WS_POPUP;
-
-		this->browser = CefBrowserHost::CreateBrowserSync(window_info, new cef_ui_handler(), url, browser_settings, {},
-		                                                  {});
-	}
-
-	HWND cef_ui::get_window()
-	{
-		if (!this->browser) return nullptr;
-		return this->browser->GetHost()->GetWindowHandle();
-	}
-
-	void cef_ui::invoke_close_browser(const CefRefPtr<CefBrowser>& browser)
-	{
-		if (!browser) return;
-		browser->GetHost()->CloseBrowser(true);
-	}
-
-	void cef_ui::close_browser()
-	{
-		if (!this->browser) return;
-		CefPostTask(TID_UI, base::BindOnce(&cef_ui::invoke_close_browser, this->browser));
-		this->browser = nullptr;
-	}
-
-	void cef_ui::reload_browser()
-	{
-		if (!this->browser) return;
-		this->browser->Reload();
-	}
-
-	cef_ui::cef_ui()
-	{
-		dynlib self = dynlib::get_by_address(dynlib::get_by_address);
-		this->path = self.get_folder();
-
-		dynlib::add_load_path(this->path + "cef");
-		dynlib libcef("libcef.dll", true);
-		if (!libcef.is_valid() || !libcef.delay_import())
+		this->browsers_.access([&](browser_vector& browsers)
 		{
-			throw std::runtime_error("Unable to import libcef");
-		}
+			for (const auto& b : browsers)
+			{
+				if (b->IsSame(browser))
+				{
+					return;
+				}
+			}
 
-		//CefEnableHighDPISupport();
+			browsers.push_back(std::move(browser));
+		});
 	}
 
-	cef_ui::~cef_ui()
+	void cef_ui::remove_browser(const CefRefPtr<CefBrowser>& browser)
 	{
-		if (this->browser)
-		{
-			this->close_browser();
-			this->work();
-		}
+		const auto end_it =
+			this->browsers_.access<bool>([&](browser_vector& browsers)
+			{
+				for (auto i = browsers.begin(); i != browsers.end(); ++i)
+				{
+					if ((*i)->IsSame(browser))
+					{
+						browsers.erase(i);
+						break;
+					}
+				}
 
-		if (this->initialized)
+				return browsers.empty();
+			});
+
+		if (end_it)
 		{
-			CefShutdown();
+			this->end_work();
 		}
+	}
+
+	bool cef_ui::has_browsers() const
+	{
+		return this->browsers_.access<bool>([&](const browser_vector& browsers)
+		{
+			return !browsers.empty();
+		});
 	}
 }

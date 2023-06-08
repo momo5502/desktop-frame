@@ -26,6 +26,32 @@ namespace utils::nt
 		static library load(const std::filesystem::path& path);
 		static library get_by_address(const void* address);
 
+		static std::filesystem::path get_dll_directory();
+		static void set_dll_directory(const std::filesystem::path& path);
+
+		class scoped_dll_directory
+		{
+		public:
+			scoped_dll_directory(const std::filesystem::path& path)
+				: directory_(get_dll_directory())
+			{
+				set_dll_directory(path);
+			}
+
+			scoped_dll_directory(scoped_dll_directory&&) = delete;
+			scoped_dll_directory(const scoped_dll_directory&) = delete;
+			scoped_dll_directory& operator=(scoped_dll_directory&&) = delete;
+			scoped_dll_directory& operator=(const scoped_dll_directory&) = delete;
+
+			~scoped_dll_directory()
+			{
+				set_dll_directory(this->directory_);
+			}
+
+		private:
+			std::filesystem::path directory_;
+		};
+
 		library();
 		explicit library(const std::string& name);
 		explicit library(HMODULE handle);

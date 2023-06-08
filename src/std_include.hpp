@@ -20,9 +20,6 @@
 
 #include <optional>
 
-// Configuration for the literally libraries
-#define LITERALLY_LIBRARY_DELAY_IMPORT
-
 using namespace std::literals;
 
 #endif

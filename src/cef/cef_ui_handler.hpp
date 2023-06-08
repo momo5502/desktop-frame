@@ -1,13 +1,20 @@
 #pragma once
 
+#include "cef_ui.hpp"
+
 namespace cef
 {
 	class cef_ui_handler : public CefClient, public CefDisplayHandler, public CefLifeSpanHandler, public CefLoadHandler,
 	                       public CefContextMenuHandler, CefRequestHandler
 	{
 	public:
-		explicit cef_ui_handler();
-		~cef_ui_handler();
+		explicit cef_ui_handler(cef_ui& ui);
+		~cef_ui_handler() override = default;
+
+		cef_ui_handler(cef_ui_handler&&) = delete;
+		cef_ui_handler(const cef_ui_handler&) = delete;
+		cef_ui_handler& operator=(cef_ui_handler&&) = delete;
+		cef_ui_handler& operator=(const cef_ui_handler&) = delete;
 
 		CefRefPtr<CefDisplayHandler> GetDisplayHandler() override
 		{
@@ -36,26 +43,24 @@ namespace cef
 
 		void OnDocumentAvailableInMainFrame(CefRefPtr<CefBrowser> browser) override;
 
-		//virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
+		void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
+		void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
 
-		virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
-		virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
+		bool DoClose(CefRefPtr<CefBrowser> browser) override;
 
-		virtual bool DoClose(CefRefPtr<CefBrowser> browser) override;
-
-		virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-		                                 CefRefPtr<CefContextMenuParams> params,
-		                                 CefRefPtr<CefMenuModel> model) override;
-		virtual bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-		                                  CefRefPtr<CefContextMenuParams> params, int command_id,
-		                                  CefContextMenuHandler::EventFlags event_flags) override;
-		virtual void OnContextMenuDismissed(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) override;
-		virtual bool RunContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-		                            CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model,
-		                            CefRefPtr<CefRunContextMenuCallback> callback) override;
+		void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+		                         CefRefPtr<CefContextMenuParams> params,
+		                         CefRefPtr<CefMenuModel> model) override;
+		bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+		                          CefRefPtr<CefContextMenuParams> params, int command_id,
+		                          EventFlags event_flags) override;
+		void OnContextMenuDismissed(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) override;
+		bool RunContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+		                    CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model,
+		                    CefRefPtr<CefRunContextMenuCallback> callback) override;
 
 	private:
-		std::vector<CefRefPtr<CefBrowser>> browser_list;
+		cef_ui& ui_;
 
 		IMPLEMENT_REFCOUNTING(cef_ui_handler);
 	};

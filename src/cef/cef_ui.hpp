@@ -1,22 +1,9 @@
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable: 4100)
+#include "cef_include.h"
 
-#include "include/base/cef_bind.h"
-#include "include/base/cef_callback.h"
-#include "include/cef_app.h"
-#include "include/cef_base.h"
-#include "include/cef_browser.h"
-#include "include/cef_client.h"
-#include "include/cef_command_line.h"
-#include "include/cef_frame.h"
-#include "include/wrapper/cef_closure_task.h"
-#include "include/wrapper/cef_helpers.h"
 
-#pragma warning(pop)
-
-#include <literally/library.hpp>
+#include "utils/concurrency.hpp"
 
 namespace cef
 {
@@ -26,22 +13,23 @@ namespace cef
 		cef_ui();
 		~cef_ui();
 
-		HWND get_window();
+		cef_ui(cef_ui&&) = delete;
+		cef_ui(const cef_ui&) = delete;
+		cef_ui& operator=(cef_ui&&) = delete;
+		cef_ui& operator=(const cef_ui&) = delete;
 
-		void close_browser();
-		void reload_browser();
-
-		int run_process();
-		void create(std::string url);
 		void work_once();
 		void work();
+		void end_work();
+
+		void add_browser(CefRefPtr<CefBrowser> browser);
+		void remove_browser(const CefRefPtr<CefBrowser>& browser);
+		bool has_browsers() const;
+
+		int run_process();
 
 	private:
-		bool initialized = false;
-
-		std::string path;
-		CefRefPtr<CefBrowser> browser;
-
-		static void invoke_close_browser(const CefRefPtr<CefBrowser>& browser);
+		using browser_vector = std::vector<CefRefPtr<CefBrowser>>;
+		utils::concurrency::container<browser_vector> browsers_{};
 	};
 }

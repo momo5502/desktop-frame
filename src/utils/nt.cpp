@@ -15,12 +15,12 @@ namespace utils::nt
 
 	library library::load(const std::string& name)
 	{
-		return library::load(name.data());
+		return load(name.data());
 	}
 
 	library library::load(const std::filesystem::path& path)
 	{
-		return library::load(path.generic_string());
+		return library(LoadLibraryW(path.wstring().data()));
 	}
 
 	library library::get_by_address(const void* address)
@@ -29,6 +29,19 @@ namespace utils::nt
 		GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
 		                   static_cast<LPCSTR>(address), &handle);
 		return library(handle);
+	}
+
+	std::filesystem::path library::get_dll_directory()
+	{
+		wchar_t buffer[0x1000];
+		GetDllDirectoryW(ARRAYSIZE(buffer), buffer);
+
+		return buffer;
+	}
+
+	void library::set_dll_directory(const std::filesystem::path& path)
+	{
+		SetDllDirectoryW(path.wstring().data());
 	}
 
 	library::library()
