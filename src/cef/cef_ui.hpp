@@ -2,7 +2,6 @@
 
 #include "cef_include.h"
 
-
 #include "utils/concurrency.hpp"
 
 namespace cef
@@ -26,7 +25,7 @@ namespace cef
 		void remove_browser(const CefRefPtr<CefBrowser>& browser);
 		bool has_browsers() const;
 
-		int run_process();
+		std::optional<int> run_process();
 
 	private:
 		using browser_vector = std::vector<CefRefPtr<CefBrowser>>;

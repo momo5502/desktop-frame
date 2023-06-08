@@ -9,7 +9,7 @@ namespace utils
 		this->spawn_worker();
 		this->locate_worker();
 
-		if (!this->worker)
+		if (!this->worker_)
 		{
 			throw std::runtime_error("Unable to locate worker");
 		}
@@ -20,30 +20,29 @@ namespace utils
 		this->hide();
 	}
 
-	void desktop_window::apply(HWND window)
+	void desktop_window::apply(const HWND window)
 	{
-		SetParent(window, this->worker);
-		ShowWindow(this->worker, SW_SHOWNORMAL);
-		UpdateWindow(this->worker);
+		SetParent(window, this->worker_);
+		ShowWindow(this->worker_, SW_SHOWNORMAL);
+		UpdateWindow(this->worker_);
 	}
 
 	void desktop_window::spawn_worker()
 	{
-		DWORD_PTR result;
-		HWND window = FindWindowA("Progman", nullptr);
+		DWORD_PTR result{};
+		const auto window = FindWindowA("Progman", nullptr);
 		SendMessageTimeoutA(window, 0x052c, 0, 0, SMTO_BLOCK, 1000, &result);
 	}
 
 	void desktop_window::locate_worker()
 	{
-		window_list windows;
-
-		for (auto window : windows)
+		const auto windows = get_window_list();
+		for (const auto window : windows)
 		{
-			HWND def_view = FindWindowExA(window, nullptr, "SHELLDLL_DefView", nullptr);
+			const auto def_view = FindWindowExA(window, nullptr, "SHELLDLL_DefView", nullptr);
 			if (def_view)
 			{
-				this->worker = FindWindowExA(nullptr, window, "WorkerW", nullptr);
+				this->worker_ = FindWindowExA(nullptr, window, "WorkerW", nullptr);
 				this->hide();
 				return;
 			}
@@ -52,8 +51,10 @@ namespace utils
 
 	void desktop_window::hide()
 	{
-		if (!this->worker) return;
-		ShowWindow(this->worker, SW_HIDE);
-		UpdateWindow(this->worker);
+		if (this->worker_)
+		{
+			ShowWindow(this->worker_, SW_HIDE);
+			UpdateWindow(this->worker_);
+		}
 	}
 }

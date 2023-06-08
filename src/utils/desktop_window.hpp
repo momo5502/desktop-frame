@@ -9,7 +9,7 @@ namespace utils
 		void apply(HWND window);
 
 	private:
-		HWND worker = nullptr;
+		HWND worker_ = nullptr;
 
 		void spawn_worker();
 		void locate_worker();

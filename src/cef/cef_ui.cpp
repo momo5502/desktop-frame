@@ -94,10 +94,16 @@ namespace cef
 		CefQuitMessageLoop();
 	}
 
-	int cef_ui::run_process()
+	std::optional<int> cef_ui::run_process()
 	{
 		const auto args = get_cef_main_args();
-		return CefExecuteProcess(args, nullptr, nullptr);
+		const auto result = CefExecuteProcess(args, nullptr, nullptr);
+		if (result >= 0)
+		{
+			return result;
+		}
+
+		return {};
 	}
 
 	void cef_ui::add_browser(CefRefPtr<CefBrowser> browser)

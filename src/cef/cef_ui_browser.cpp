@@ -1,9 +1,6 @@
 #include "std_include.hpp"
 
 #include "cef/cef_ui_browser.hpp"
-
-#include <literally/library.hpp>
-
 #include "cef/cef_ui_handler.hpp"
 
 namespace cef
@@ -55,12 +52,10 @@ namespace cef
 
 		CefPostTask(TID_UI, base::BindOnce([](const CefRefPtr<CefBrowser> b)
 		{
-			if (!b)
+			if (b)
 			{
-				return;
+				b->GetHost()->CloseBrowser(true);
 			}
-
-			b->GetHost()->CloseBrowser(true);
 		}, std::move(browser)));
 	}
 

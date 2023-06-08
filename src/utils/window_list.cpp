@@ -3,25 +3,20 @@
 
 namespace utils
 {
-	window_list::window_list()
+	namespace
 	{
-		EnumWindows(window_list::enumerator, LPARAM(this));
+		int WINAPI enumerator(const HWND window, const LPARAM param)
+		{
+			auto& list = *reinterpret_cast<std::vector<HWND>*>(param);
+			list.push_back(window);
+			return TRUE;
+		}
 	}
 
-	std::vector<HWND>::iterator window_list::begin()
+	std::vector<HWND> get_window_list()
 	{
-		return this->windows.begin();
-	}
-
-	std::vector<HWND>::iterator window_list::end()
-	{
-		return this->windows.end();
-	}
-
-	int __stdcall window_list::enumerator(HWND window, LPARAM param)
-	{
-		window_list* list = reinterpret_cast<window_list*>(param);
-		list->windows.push_back(window);
-		return TRUE;
+		std::vector<HWND> windows{};
+		EnumWindows(enumerator, LPARAM(&windows));
+		return windows;
 	}
 }

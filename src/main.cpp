@@ -1,5 +1,4 @@
 #include "std_include.hpp"
-#include "frame.hpp"
 
 #include "utils/nt.hpp"
 #include "utils/system_tray.hpp"
@@ -11,7 +10,7 @@
 
 namespace
 {
-	void spawn_cef_windows(cef::cef_ui& ui)
+	void run(cef::cef_ui& ui)
 	{
 		utils::desktop_window desktop{};
 
@@ -58,17 +57,19 @@ namespace
 		watcher.join();
 	}
 
-	int run()
+	int main()
 	{
+		srand(static_cast<uint32_t>(time(nullptr) ^ ~(GetTickCount64() * GetCurrentProcessId())));
+
 		cef::cef_ui ui;
 
-		const int result = ui.run_process();
-		if (result >= 0)
+		const auto result = ui.run_process();
+		if (result)
 		{
-			return result;
+			return *result;
 		}
 
-		spawn_cef_windows(ui);
+		run(ui);
 		return 0;
 	}
 }
@@ -77,7 +78,7 @@ int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	try
 	{
-		return run();
+		return main();
 	}
 	catch (std::exception& e)
 	{

@@ -8,30 +8,22 @@ namespace utils
 	class system_tray
 	{
 	public:
-		system_tray(std::string title);
+		system_tray(const std::string& title);
 		~system_tray();
 
-		void add_item(std::string title, std::function<void()> callback);
+		void add_item(const std::string& title, std::function<void()> callback);
 
 	private:
-		std::string title;
-		std::string classname;
+		std::string classname_{};
 
-		std::vector<std::function<void()>> callbacks;
+		std::vector<std::function<void()>> callbacks_{};
 
-		HINSTANCE instance = nullptr;
-		HICON icon = nullptr;
-		HMENU menu = nullptr;
-		HWND window = nullptr;
-		WNDCLASSEXA window_class;
-		NOTIFYICONDATAA notify_icon_data;
+		HINSTANCE instance_ = nullptr;
+		HMENU menu_ = nullptr;
+		HWND window_ = nullptr;
+		NOTIFYICONDATAA notify_icon_data_{};
 
-		void generate_classname();
-		void initialize_class();
-		void initialize_window();
-		void initialize_notify_icon_data();
-
-		void execute_callback(size_t id);
+		void execute_callback(size_t id) const;
 
 		LRESULT window_procedure(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param);
 		static LRESULT CALLBACK static_window_procedure(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param);

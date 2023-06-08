@@ -1,182 +1,191 @@
 #include "std_include.hpp"
 
+#include "utils/nt.hpp"
 #include "utils/system_tray.hpp"
-
-#include <literally/library.hpp>
-
-using namespace literally;
 
 namespace utils
 {
-	system_tray::system_tray(std::string _title) : title(_title)
+	namespace
 	{
-		dynlib proc;
-		this->instance = proc.get_handle();
+		void create_window_class(const HINSTANCE instance, const HICON icon, const std::string& classname,
+		                         const WNDPROC procedure)
+		{
+			WNDCLASSEXA window_class{};
+			ZeroMemory(&window_class, sizeof(window_class));
 
-		this->menu = CreatePopupMenu();
-		this->icon = LoadIcon(this->instance, MAKEINTRESOURCE(IDI_ICON_1));
+			window_class.cbSize = sizeof(window_class);
+			window_class.hInstance = instance;
+			window_class.lpszClassName = classname.data();
+			window_class.lpfnWndProc = procedure;
+			window_class.style = CS_DBLCLKS;
 
-		this->generate_classname();
-		this->initialize_class();
-		this->initialize_window();
-		this->initialize_notify_icon_data();
+			window_class.hIcon = icon;
+			window_class.hIconSm = icon;
+			window_class.hCursor = LoadCursor(nullptr, IDC_ARROW);
+			window_class.lpszMenuName = nullptr;
+			window_class.cbClsExtra = 0;
+			window_class.cbWndExtra = 0;
+			window_class.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
 
-		ShowWindow(this->window, SW_SHOW);
-		ShowWindow(this->window, SW_HIDE);
+			RegisterClassExA(&window_class);
+		}
+
+		std::string generate_classname()
+		{
+			return "system_tray_" + std::to_string(time(nullptr)) + "_" + std::to_string(rand() | (rand() << 16));
+		}
+
+		HWND create_window(const HINSTANCE instance, const std::string& title, const std::string& classname,
+		                   void* user_data)
+		{
+			const auto window = CreateWindowExA(0, classname.data(), title.data(), WS_VISIBLE | WS_POPUP, -100, -100, 1,
+			                                    1, HWND_DESKTOP,
+			                                    nullptr, instance, nullptr);
+
+			SetWindowLongPtrA(window, GWLP_USERDATA, LONG_PTR(user_data));
+			return window;
+		}
+
+		NOTIFYICONDATAA create_notify_icon_data(const std::string& title, const HWND window, const HICON icon)
+		{
+			NOTIFYICONDATAA notify_icon_data{};
+			ZeroMemory(&notify_icon_data, sizeof(notify_icon_data));
+
+			notify_icon_data.cbSize = sizeof(notify_icon_data);
+			notify_icon_data.hWnd = window;
+			notify_icon_data.uID = ID_TRAY_COMMAND;
+			notify_icon_data.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+			notify_icon_data.uCallbackMessage = WM_SYSTRAY;
+			notify_icon_data.hIcon = icon;
+			memcpy(notify_icon_data.szTip, title.data(), std::min(title.size() + 1, sizeof(notify_icon_data.szTip) + 1));
+
+			return notify_icon_data;
+		}
+	}
+
+	system_tray::system_tray(const std::string& title)
+	{
+		const nt::library main{};
+		this->instance_ = main.get_handle();
+		this->classname_ = generate_classname();
+
+		const auto icon = LoadIcon(this->instance_, MAKEINTRESOURCE(IDI_ICON_1));
+
+		create_window_class(this->instance_, icon, this->classname_, static_window_procedure);
+		this->window_ = create_window(this->instance_, title, this->classname_, this);
+
+		this->menu_ = CreatePopupMenu();
+		this->notify_icon_data_ = create_notify_icon_data(title, this->window_, icon);
+
+		ShowWindow(this->window_, SW_SHOW);
+		ShowWindow(this->window_, SW_HIDE);
 	}
 
 	system_tray::~system_tray()
 	{
-		Shell_NotifyIconA(NIM_DELETE, &this->notify_icon_data);
-		UnregisterClassA(this->classname.data(), this->instance);
+		Shell_NotifyIconA(NIM_DELETE, &this->notify_icon_data_);
+		UnregisterClassA(this->classname_.data(), this->instance_);
 	}
 
-	void system_tray::add_item(std::string name, std::function<void()> callback)
+	void system_tray::add_item(const std::string& name, std::function<void()> callback)
 	{
-		this->callbacks.push_back(callback);
-		AppendMenuA(this->menu, MF_STRING, ID_TRAY_COMMAND + this->callbacks.size(), name.data());
+		this->callbacks_.push_back(std::move(callback));
+		AppendMenuA(this->menu_, MF_STRING, ID_TRAY_COMMAND + this->callbacks_.size(), name.data());
 	}
 
-	void system_tray::generate_classname()
-	{
-		char buffer[200] = { 0 };
-		snprintf(buffer, sizeof(buffer), "%llX_%X", time(nullptr), rand() | (rand() << 16));
-
-		this->classname = "system_tray_";
-		this->classname += buffer;
-	}
-
-	void system_tray::initialize_class()
-	{
-		ZeroMemory(&this->window_class, sizeof(this->window_class));
-
-		this->window_class.hInstance = this->instance;
-		this->window_class.lpszClassName = this->classname.data();
-		this->window_class.lpfnWndProc = system_tray::static_window_procedure;
-		this->window_class.style = CS_DBLCLKS;
-		this->window_class.cbSize = sizeof(this->window_class);
-
-		this->window_class.hIcon = this->icon;
-		this->window_class.hIconSm = this->icon;
-		this->window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
-		this->window_class.lpszMenuName = NULL;
-		this->window_class.cbClsExtra = 0;
-		this->window_class.cbWndExtra = 0;
-		this->window_class.hbrBackground = HBRUSH(CreateSolidBrush(RGB(255, 255, 255)));
-
-		RegisterClassExA(&this->window_class);
-	}
-
-	void system_tray::initialize_notify_icon_data()
-	{
-		ZeroMemory(&this->notify_icon_data, sizeof(this->notify_icon_data));
-
-		this->notify_icon_data.cbSize = sizeof(this->notify_icon_data);
-		this->notify_icon_data.hWnd = this->window;
-		this->notify_icon_data.uID = ID_TRAY_COMMAND;
-		this->notify_icon_data.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-		this->notify_icon_data.uCallbackMessage = WM_SYSTRAY;
-		this->notify_icon_data.hIcon = this->icon;
-		strncpy_s(this->notify_icon_data.szTip, this->title.data(), sizeof(this->notify_icon_data.szTip));
-	}
-
-	void system_tray::initialize_window()
-	{
-		this->window = CreateWindowExA(
-			0,
-			this->classname.data(),
-			this->title.data(),
-			WS_VISIBLE | WS_POPUP,
-			-100,
-			-100,
-			1,
-			1,
-			HWND_DESKTOP,
-			NULL,
-			this->instance,
-			NULL
-		);
-
-		SetWindowLongPtrA(this->window, GWLP_USERDATA, LONG_PTR(this));
-	}
-
-	LRESULT system_tray::window_procedure(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param)
+	LRESULT system_tray::window_procedure(const HWND hwnd, const UINT message, const WPARAM w_param,
+	                                      const LPARAM l_param)
 	{
 		switch (message)
 		{
 		case WM_ACTIVATE:
 			ShowWindow(hwnd, SW_HIDE);
-			Shell_NotifyIconA(NIM_ADD, &this->notify_icon_data);
+			Shell_NotifyIconA(NIM_ADD, &this->notify_icon_data_);
 			break;
 
 		case WM_NCHITTEST:
-		{
-			LRESULT uHitTest = DefWindowProcA(hwnd, WM_NCHITTEST, w_param, l_param);
-			if (uHitTest == HTCLIENT)
-				return HTCAPTION;
-			else
-				return uHitTest;
-		}
+			{
+				const LRESULT u_hit_test = DefWindowProcA(hwnd, WM_NCHITTEST, w_param, l_param);
+				if (u_hit_test == HTCLIENT)
+				{
+					return HTCAPTION;
+				}
+
+				return u_hit_test;
+			}
 
 		case WM_COMMAND:
-		{
-			if ((w_param >> 16) == 0)
 			{
-				SendMessage(hwnd, WM_NULL, 0, 0);
-				this->execute_callback(w_param);
+				if ((w_param >> 16) == 0)
+				{
+					SendMessage(hwnd, WM_NULL, 0, 0);
+					this->execute_callback(w_param);
+				}
+
+				return 0;
 			}
-		}
 
 		case WM_CLOSE:
-			return 0;
+			{
+				return 0;
+			}
 
 		case WM_DESTROY:
-			this->window = nullptr;
+			this->window_ = nullptr;
 			PostQuitMessage(0);
 			break;
 
 		case WM_SYSTRAY:
-		{
-			if (w_param == ID_TRAY_COMMAND)
 			{
-				SetForegroundWindow(hwnd);
-			}
+				if (w_param == ID_TRAY_COMMAND)
+				{
+					SetForegroundWindow(hwnd);
+				}
 
-			if (l_param == WM_RBUTTONDOWN)
-			{
-				POINT curPoint;
-				GetCursorPos(&curPoint);
-				SetForegroundWindow(hwnd);
+				if (l_param == WM_RBUTTONDOWN)
+				{
+					POINT curPoint;
+					GetCursorPos(&curPoint);
+					SetForegroundWindow(hwnd);
 
-				TrackPopupMenu(this->menu, /*TPM_RETURNCMD | TPM_NONOTIFY*/0, curPoint.x, curPoint.y, 0, hwnd, NULL);
+					TrackPopupMenu(this->menu_, /*TPM_RETURNCMD | TPM_NONOTIFY*/0, curPoint.x, curPoint.y, 0, hwnd,
+					               nullptr);
+				}
 			}
-		}
-		break;
+			break;
 
 		case WM_SYSTRAY_END:
-		{
-			Shell_NotifyIconA(NIM_DELETE, &this->notify_icon_data);
-			PostQuitMessage(0);
-		}
-		break;
+			{
+				Shell_NotifyIconA(NIM_DELETE, &this->notify_icon_data_);
+				PostQuitMessage(0);
+			}
+			break;
+
+		default:
+			break;
 		}
 
 		return DefWindowProcA(hwnd, message, w_param, l_param);
 	}
 
-	LRESULT CALLBACK system_tray::static_window_procedure(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param)
+	LRESULT CALLBACK system_tray::static_window_procedure(const HWND hwnd, const UINT message, const WPARAM w_param,
+	                                                      const LPARAM l_param)
 	{
-		system_tray* object = reinterpret_cast<system_tray*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-		if (object) return object->window_procedure(hwnd, message, w_param, l_param);
+		auto* object = reinterpret_cast<system_tray*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		if (object)
+		{
+			return object->window_procedure(hwnd, message, w_param, l_param);
+		}
+
 		return DefWindowProcA(hwnd, message, w_param, l_param);
 	}
 
-	void system_tray::execute_callback(size_t id)
+	void system_tray::execute_callback(const size_t id) const
 	{
-		size_t index = id - (ID_TRAY_COMMAND + 1);
-		if (index >= 0 && index < this->callbacks.size())
+		const size_t index = id - (ID_TRAY_COMMAND + 1);
+		if (index < this->callbacks_.size())
 		{
-			this->callbacks[index]();
+			this->callbacks_[index]();
 		}
 	}
 }
