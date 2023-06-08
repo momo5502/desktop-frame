@@ -25,7 +25,7 @@ int frame::run()
 
 		//cef_ui.create("https://earth.plus360degrees.com/");
 		cef_ui.create(
-			"https://www.youtube.com/embed/qC0vDKVPCrw?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1");
+			"https://www.youtube.com/embed/l40nk18GUzk?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1");
 		//cef_ui.create("file:///C:/Users/mauri/Desktop/video.html");
 	}
 
