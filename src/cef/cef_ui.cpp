@@ -5,10 +5,6 @@
 #include "cef/cef_ui.hpp"
 #include "cef/cef_ui_app.hpp"
 
-#pragma comment(lib, "Shlwapi.lib")
-#pragma comment(lib, "Ws2_32.lib")
-#pragma comment(lib, "delayimp.lib")
-
 namespace cef
 {
 	namespace

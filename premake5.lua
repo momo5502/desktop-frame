@@ -32,7 +32,9 @@ dependencies.load()
 
 workspace "desktopframe"
 	configurations { "Debug", "Release" }
-	platforms { "Win32", "Win64" }
+	
+	architecture "x86_64"
+	platforms "x64"
 	
 	location "./build"
 	objdir "%{wks.location}/obj"
@@ -46,15 +48,9 @@ workspace "desktopframe"
 	filter "toolset:msc*"
 		buildoptions { "/utf-8", "/Zm200" }
 	
-	filter "platforms:*32"
-		architecture "x86"
-	
-	filter "platforms:*64"
-		architecture "x86_64"
-	
-	filter "platforms:Win*"
-		system "windows"
-		defines { "_WINDOWS" }
+	filter "platforms:x64"
+		defines {"_WINDOWS", "WIN32"}
+	filter {}
 	
 	filter {}
 
@@ -72,10 +68,6 @@ workspace "desktopframe"
 	editandcontinue "Off"
 	warnings "Extra"
 	characterset "ASCII"
-
-	filter "platforms:x64"
-		defines {"_WINDOWS", "WIN32"}
-	filter {}
 
 	filter "configurations:Release"
 		optimize "Size"

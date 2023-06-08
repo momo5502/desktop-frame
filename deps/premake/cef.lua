@@ -6,9 +6,23 @@ cef = {
 
 function cef.import()
 	filter {"kind:not StaticLib" }
-	links { "cef", "cef_sandbox", "libcef", "Dbghelp.lib", "Winmm.lib", "Version.lib", "SetupAPI.lib", "Powrprof.lib", "Propsys.lib" }
+	links {
+		"cef",
+		"cef_sandbox",
+		"libcef",
+		"Dbghelp.lib",
+		"Winmm.lib",
+		"Version.lib",
+		"SetupAPI.lib",
+		"Powrprof.lib",
+		"Propsys.lib",
+		"Shlwapi.lib",
+		"Ws2_32.lib",
+		"delayimp.lib",
+	}
 	linkoptions { "/DELAYLOAD:libcef.dll" }
 	filter {}
+	
 	cef.includes()
 end
 
@@ -24,6 +38,10 @@ function cef.includes()
 		libdirs { path.join(cef.source, "Release") }
 	filter { "Debug" }
 		libdirs { path.join(cef.source, "Debug") }
+		defines {
+			"_ITERATOR_DEBUG_LEVEL=0",
+			"_HAS_ITERATOR_DEBUGGING=0",
+		}
 	filter {}
 end
 
@@ -69,14 +87,14 @@ function cef.project()
 		}
 
 		postbuildcommands {
-			"mkdir \"%{wks.location}runtime/%{cfg.platform}/%{cfg.buildcfg}/cef/\" 2> nul",
-			"mkdir \"%{wks.location}runtime/%{cfg.platform}/%{cfg.buildcfg}/cef/locales/\" 2> nul",
-			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.dll\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
-			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.bin\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
-			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
-			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.dat\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\\"",
-			--"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\*.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\locales\\\"",
-			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\en-US.pak\" \"%{wks.location}runtime\\%{cfg.platform}\\%{cfg.buildcfg}\\cef\\locales\\\"",
+			"mkdir \"%{wks.location}runtime/%{cfg.buildcfg}/cef/\" 2> nul",
+			"mkdir \"%{wks.location}runtime/%{cfg.buildcfg}/cef/locales/\" 2> nul",
+			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.dll\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\cef\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\%{cfg.buildcfg}\\*.bin\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\cef\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.pak\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\cef\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\*.dat\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\cef\\\"",
+			--"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\*.pak\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\cef\\locales\\\"",
+			"copy /y \"%{wks.location}..\\deps\\cef\\Resources\\locales\\en-US.pak\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\cef\\locales\\\"",
 		}
 
 		linkoptions { "-IGNORE:4221", "-IGNORE:4006" }
