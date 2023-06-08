@@ -5,17 +5,18 @@ namespace cef
 	class cef_ui_app : public CefApp, public CefBrowserProcessHandler
 	{
 	public:
-		cef_ui_app();
+		cef_ui_app() = default;
 
-		virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override
+		CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override
 		{
 			return this;
 		}
 
-		virtual void OnContextInitialized() override;
+		void OnContextInitialized() override;
 
 	protected:
-		virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
+		void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
+		void OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line) override;
 
 
 	private:
