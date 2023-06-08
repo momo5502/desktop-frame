@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Grid App</title>
+    <style>
+      /* CSS for overall layout */
+      body {
+        background-color: #000;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      /* CSS for grain background */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.05; /* Adjust the opacity to make it more translucent */
+        background-image: url("https://assets.production.linktr.ee/profiles/_next/static/images/img-noise-256x256-36e9e9b0e280b6ea21eae10d9e697d74.png");
+        pointer-events: none; /* Prevent the pseudo-element from interfering with user interaction */
+      }
+
+      /* CSS for foreground image */
+      .foreground-image {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        filter: blur(50px); /* Apply the blur filter */
+        background-image: url("https://d1fdloi71mui9q.cloudfront.net/mCAIT7uARCO0fLiQbBiB_A82kOyFP6zeWx8L1");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        opacity: 0.25;
+      }
+
+      /* CSS for navigation bar */
+      .navbar {
+        background-color: #222;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add drop shadow */
+      }
+
+      .navbar-brand {
+        color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      .navbar-search {
+        margin-left: auto;
+        text-align: center;
+        border-radius: 7px; /* Add rounded corners */
+        overflow: hidden; /* Ensure rounded corners are applied */
+      }
+
+      .search-input {
+        background-color: #444;
+        border: none;
+        padding: 8px;
+        color: #fff;
+        border-radius: 7px; /* Reduce border radius */
+      }
+
+      /* CSS for grid layout */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(200px, 1fr)
+        ); /* Adjust the minimum width of thumbnails */
+        grid-gap: 20px; /* Increase spacing between thumbnails */
+        padding: 20px;
+      }
+
+      /* CSS for video container */
+      .video-container {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio (adjust as needed) */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
+        border-radius: 20px; /* Add rounded corners */
+        cursor: pointer; /* Add cursor pointer for clickable effect */
+      }
+
+      /* CSS for video thumbnail */
+      .video-thumbnail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px; /* Add rounded corners */
+      }
+
+      /* CSS for video popup */
+      .video-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .video-popup.active {
+        display: flex;
+      }
+
+      .video-popup-content {
+        width: 80%;
+        max-width: 800px;
+        padding: 20px;
+        text-align: center;
+        background-color: #222;
+        border-radius: 10px;
+        position: relative;
+        animation: slideAndFadeIn 0.1s ease-in-out forwards;
+        transform: translateY(50%);
+      }
+
+      @keyframes slideAndFadeIn {
+        0% {
+          transform: translateY(50%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .video-popup-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        background-color: black;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="foreground-image"></div>
+
+    <nav class="navbar">
+      <a href="#" class="navbar-brand">Video Grid App</a>
+      <div class="navbar-search">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search videos..."
+        />
+      </div>
+    </nav>
+
+    <div class="grid" id="video-grid">
+      <!-- Thumbnails will be dynamically generated here -->
+    </div>
+
+    <div class="video-popup">
+      <div class="video-popup-content">
+        <iframe
+          id="video-iframe"
+          width="560"
+          height="315"
+          src=""
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+        <span class="video-popup-close">&times;</span>
+      </div>
+    </div>
+
+    <script>
+      // Video data (example)
+      var videoData = [
+        { alt: "Video 1", videoId: "Ci4H0VCHYnM" },
+        { alt: "Video 2", videoId: "wjQq0nSGS28" },
+        { alt: "Video 3", videoId: "jgm58cbu0kw" },
+        { alt: "Video 4", videoId: "suk1xtL6G-Y" },
+        // Add more video data as needed
+      ];
+
+      // Generate thumbnails dynamically
+      function generateThumbnails() {
+        var grid = document.getElementById("video-grid");
+        var thumbnailsHTML = "";
+
+        for (var i = 0; i < videoData.length; i++) {
+          var videoId = videoData[i].videoId;
+          var thumbnailUrl = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
+          var altText = videoData[i].alt;
+          var videoUrl = `https://www.youtube.com/embed/${videoId}`;
+
+          var thumbnailHTML = `
+                    <div class="video-container">
+                        <img class="video-thumbnail" src="${thumbnailUrl}" alt="${altText}" data-video-url="${videoUrl}">
+                    </div>
+                `;
+
+          thumbnailsHTML += thumbnailHTML;
+        }
+
+        grid.innerHTML = thumbnailsHTML;
+      }
+
+      // Show video popup
+      function showVideoPopup(videoUrl) {
+        var videoPopup = document.querySelector(".video-popup");
+        var videoIframe = document.getElementById("video-iframe");
+
+        videoIframe.src = videoUrl;
+        videoPopup.classList.add("active");
+      }
+
+      // Close video popup
+      function closeVideoPopup() {
+        var videoPopup = document.querySelector(".video-popup");
+        var videoIframe = document.getElementById("video-iframe");
+
+        videoIframe.src = "";
+        videoPopup.classList.remove("active");
+      }
+
+      // Event delegation for thumbnail clicks
+      document.addEventListener("click", function (event) {
+        var clickedElement = event.target;
+
+        if (clickedElement.classList.contains("video-thumbnail")) {
+          var videoUrl = clickedElement.getAttribute("data-video-url");
+          showVideoPopup(videoUrl);
+        }
+
+        if (clickedElement.classList.contains("video-popup-close")) {
+          closeVideoPopup();
+        }
+      });
+
+      // Generate thumbnails on page load
+      generateThumbnails();
+    </script>
+  </body>
+</html>

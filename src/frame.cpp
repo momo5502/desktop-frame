@@ -25,8 +25,8 @@ int frame::run()
 
 		//cef_ui.create("https://earth.plus360degrees.com/");
 		cef_ui.create(
-			"https://www.youtube.com/embed/-mubAzA0X04?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1");
-		//cef_ui.create("file:///C:/Users/mauri/Desktop/test.html");
+			"https://www.youtube.com/embed/qC0vDKVPCrw?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1");
+		//cef_ui.create("file:///C:/Users/mauri/Desktop/video.html");
 	}
 
 
@@ -35,7 +35,18 @@ int frame::run()
 		desktop.apply(cef_ui.get_window());
 	}
 
-	MoveWindow(cef_ui.get_window(), 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN), true);
+
+	std::atomic_bool exit{false};
+	std::thread watcher([&]
+	{
+		const auto window = cef_ui.get_window();
+		while (IsWindow(window) && !exit)
+		{
+			MoveWindow(window, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN),
+			           GetSystemMetrics(SM_CYVIRTUALSCREEN), true);
+			std::this_thread::sleep_for(10ms);
+		}
+	});
 
 	utils::system_tray tray("Desktop Frame");
 	{
@@ -56,5 +67,8 @@ int frame::run()
 	}
 
 	cef_ui.work();
+
+	exit = true;
+	watcher.join();
 	return 0;
 }

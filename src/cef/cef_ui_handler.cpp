@@ -8,12 +8,19 @@ namespace cef
 {
 	cef_ui_handler::cef_ui_handler()
 	{
-
 	}
 
 	cef_ui_handler::~cef_ui_handler()
 	{
+	}
 
+	void cef_ui_handler::OnDocumentAvailableInMainFrame(CefRefPtr<CefBrowser> browser)
+	{
+		std::ifstream t("C:/Users/mauri/Desktop/script.js");
+		std::string str((std::istreambuf_iterator<char>(t)),
+			std::istreambuf_iterator<char>());
+
+		browser->GetMainFrame()->ExecuteJavaScript(str, "", 0);
 	}
 
 	void cef_ui_handler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
@@ -49,24 +56,27 @@ namespace cef
 		return false;
 	}
 
-	void cef_ui_handler::OnBeforeContextMenu(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/, CefRefPtr<CefContextMenuParams> /*params*/, CefRefPtr<CefMenuModel> model)
+	void cef_ui_handler::OnBeforeContextMenu(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/,
+	                                         CefRefPtr<CefContextMenuParams> /*params*/, CefRefPtr<CefMenuModel> model)
 	{
 		model->Clear();
 	}
 
-	bool cef_ui_handler::OnContextMenuCommand(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/, CefRefPtr<CefContextMenuParams> /*params*/, int /*command_id*/, CefContextMenuHandler::EventFlags /*event_flags*/)
+	bool cef_ui_handler::OnContextMenuCommand(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/,
+	                                          CefRefPtr<CefContextMenuParams> /*params*/, int /*command_id*/,
+	                                          CefContextMenuHandler::EventFlags /*event_flags*/)
 	{
 		return false;
 	}
 
 	void cef_ui_handler::OnContextMenuDismissed(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/)
 	{
-
 	}
 
-	bool cef_ui_handler::RunContextMenu(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/, CefRefPtr<CefContextMenuParams> /*params*/, CefRefPtr<CefMenuModel> /*model*/, CefRefPtr<CefRunContextMenuCallback> /*callback*/)
+	bool cef_ui_handler::RunContextMenu(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/,
+	                                    CefRefPtr<CefContextMenuParams> /*params*/, CefRefPtr<CefMenuModel> /*model*/,
+	                                    CefRefPtr<CefRunContextMenuCallback> /*callback*/)
 	{
 		return false;
 	}
-
 }
