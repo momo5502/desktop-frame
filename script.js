@@ -14,7 +14,69 @@ function handleSizeChange() {
   console.log(window.innerWidth);
   console.log(window.innerHeight);
   document.body.style.transform = `scale(${scale})`;
-  document.body.style.filter = `saturate(1.5) blur(80px)`;
+  document.body.style.filter = `saturate(1.1) blur(0px)`;
+}
+
+function injectStyles() {
+  const styles = document.createElement("style");
+  styles.textContent = `
+
+  .momo-widget,
+  .momo-widget * {
+    color: #222;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+.momo-widget {
+    z-index: 9999;
+    position: fixed;
+    margin: 20px;
+    padding: 30px;
+    backdrop-filter: blur(30px) saturate(2);
+    box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+
+    right: 50px;
+    bottom: 60%;
+    min-width: 50px;
+    min-height: 50px;
+    font-size: 20px;
+
+    min-height: 200px;
+}
+
+.momo-widget-2 {
+  bottom: 30%;
+}
+  `;
+
+  const htmlContent = `
+    <span style="font-size: 35px">Sample Widget</span>
+    <p>
+      Something interesting 😀
+    </p>
+  `;
+
+  const htmlContent2 = `
+  <span style="font-size: 35px">Sample Widget</span>
+  <p>
+    Nothing interesting 🫥
+  </p>
+`;
+
+  const widget = document.createElement("div");
+  widget.classList.add("momo-widget");
+  widget.innerHTML = htmlContent;
+
+  const widget2 = document.createElement("div");
+  widget2.classList.add("momo-widget");
+  widget2.classList.add("momo-widget-2");
+  widget2.innerHTML = htmlContent2;
+
+  document.body.appendChild(styles);
+  document.body.parentElement.appendChild(widget);
+  document.body.parentElement.appendChild(widget2);
 }
 
 function main() {
@@ -27,6 +89,8 @@ function main() {
   new ResizeObserver(handleSizeChange).observe(video);
   window.addEventListener("resize", handleSizeChange);
   handleSizeChange();
+
+  injectStyles();
 }
 
 document.addEventListener("DOMContentLoaded", main);
