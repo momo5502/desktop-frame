@@ -3,13 +3,16 @@
   <head>
     <title>Video Grid App</title>
     <style>
+      * {
+        color: #f0f0f0;
+      }
+
       /* CSS for overall layout */
       body {
         background-color: #000;
-        color: #fff;
         margin: 0;
         padding: 0;
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI Light', Tahoma, Geneva, Verdana, sans-serif;
       }
 
       /* CSS for grain background */
@@ -21,7 +24,7 @@
         width: 100%;
         height: 100%;
         z-index: -1;
-        opacity: 0.05; /* Adjust the opacity to make it more translucent */
+        opacity: 0.07; /* Adjust the opacity to make it more translucent */
         background-image: url("https://assets.production.linktr.ee/profiles/_next/static/images/img-noise-256x256-36e9e9b0e280b6ea21eae10d9e697d74.png");
         pointer-events: none; /* Prevent the pseudo-element from interfering with user interaction */
       }
@@ -39,21 +42,20 @@
         background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
-        opacity: 0.25;
+        opacity: 0.3;
       }
 
       /* CSS for navigation bar */
       .navbar {
-        background-color: #222;
+        background-color: #44444477;
         padding: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add drop shadow */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add drop shadow */
       }
 
       .navbar-brand {
-        color: #fff;
         font-size: 20px;
         font-weight: bold;
         text-decoration: none;
@@ -61,7 +63,6 @@
       }
 
       .navbar-settings {
-        color: #fff;
         font-size: 20px;
         margin-left: 10px;
       }
@@ -77,7 +78,6 @@
         background-color: #444;
         border: none;
         padding: 8px;
-        color: #fff;
         border-radius: 7px; /* Reduce border radius */
         width: 100%;
       }
@@ -100,7 +100,7 @@
         width: 100%;
         padding-bottom: 56.25%; /* 16:9 aspect ratio (adjust as needed) */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
-        border-radius: 20px; /* Add rounded corners */
+        border-radius: 10px; /* Add rounded corners */
         cursor: pointer; /* Add cursor pointer for clickable effect */
       }
 
@@ -112,7 +112,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 20px; /* Add rounded corners */
+        border-radius: 10px; /* Add rounded corners */
       }
 
       /* CSS for video popup */
@@ -161,7 +161,6 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        color: #fff;
         font-size: 20px;
         cursor: pointer;
         background-color: black;
