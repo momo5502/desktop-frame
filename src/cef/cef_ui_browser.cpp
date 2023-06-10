@@ -5,7 +5,8 @@
 
 namespace cef
 {
-	cef_ui_browser::cef_ui_browser(const std::string& title, const std::string& url, const CefRefPtr<cef_ui_handler>& ui_handler)
+	cef_ui_browser::cef_ui_browser(const std::string& title, const std::string& url,
+	                               const CefRefPtr<cef_ui_handler>& ui_handler)
 	{
 		CefWindowInfo window_info{};
 		window_info.SetAsPopup(nullptr, "");
@@ -39,7 +40,12 @@ namespace cef
 
 	cef_ui_browser::operator bool() const
 	{
-		return this->browser_.operator bool();
+		if (!this->browser_)
+		{
+			return false;
+		}
+
+		return this->browser_->IsValid();
 	}
 
 	void cef_ui_browser::close_browser()
@@ -47,7 +53,7 @@ namespace cef
 		auto browser = this->browser_;
 		this->browser_ = nullptr;
 
-		if (!browser)
+		if (!browser || !browser->IsValid())
 		{
 			return;
 		}
