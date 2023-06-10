@@ -1,6 +1,6 @@
 cef = {
-	versionShort = "106.1.0",
-	versionLong = "cef_binary_106.1.0+g30ad805+chromium-106.0.5249.119_windows64",
+	versionShort = "114.2.10",
+	versionLong = "cef_binary_114.2.10+g398e3c3+chromium-114.0.5735.110_windows64",
 	source = "deps/cef"
 }
 
@@ -10,15 +10,27 @@ function cef.import()
 		"cef",
 		"cef_sandbox",
 		"libcef",
-		"Dbghelp.lib",
-		"Winmm.lib",
-		"Version.lib",
-		"SetupAPI.lib",
-		"Powrprof.lib",
+		"comctl32.lib",
+		"gdi32.lib",
+		"rpcrt4.lib",
+		"shlwapi.lib",
+		"ws2_32.lib",
+		"Advapi32.lib",
+		"dbghelp.lib",
+		"Delayimp.lib",
+		"ntdll.lib",
+		"OleAut32.lib",
+		"PowrProf.lib",
 		"Propsys.lib",
-		"Shlwapi.lib",
-		"Ws2_32.lib",
-		"delayimp.lib",
+		"psapi.lib",
+		"SetupAPI.lib",
+		"Shell32.lib",
+		"Shcore.lib",
+		"Userenv.lib",
+		"version.lib",
+		"wbemuuid.lib",
+		"WindowsApp.lib",
+		"winmm.lib",
 	}
 	linkoptions { "/DELAYLOAD:libcef.dll" }
 	filter {}

@@ -39,8 +39,6 @@ namespace cef
 	{
 		delay_load_cef();
 
-		CefEnableHighDPISupport();
-
 		const auto args = get_cef_main_args();
 
 		CefSettings settings;
