@@ -9,6 +9,15 @@ namespace cef
 		this->stop_watcher();
 	}
 
+	void cef_ui_wallpaper_handler::fill_window_info(CefWindowInfo& window_info) const
+	{
+		window_info.bounds.width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+		window_info.bounds.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+		window_info.bounds.x = 0;
+		window_info.bounds.y = 0;
+		window_info.style = WS_VISIBLE | WS_POPUP;
+	}
+
 	void cef_ui_wallpaper_handler::OnDocumentAvailableInMainFrame(const CefRefPtr<CefBrowser> browser)
 	{
 		std::ifstream t("C:/Users/mauri/Desktop/script.js");

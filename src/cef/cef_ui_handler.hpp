@@ -16,6 +16,10 @@ namespace cef
 		cef_ui_handler& operator=(cef_ui_handler&&) = delete;
 		cef_ui_handler& operator=(const cef_ui_handler&) = delete;
 
+		virtual void fill_window_info(CefWindowInfo&) const
+		{
+		}
+
 		CefRefPtr<CefDisplayHandler> GetDisplayHandler() override
 		{
 			return this;

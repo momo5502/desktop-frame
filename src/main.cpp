@@ -14,6 +14,7 @@ namespace
 	void run(cef::cef_ui& ui)
 	{
 		cef::cef_ui_browser browser{
+			"DesktopFrame",
 			"https://www.youtube.com/embed/l40nk18GUzk?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1",
 			new cef::cef_ui_wallpaper_handler(ui)
 		};

@@ -5,15 +5,12 @@
 
 namespace cef
 {
-	cef_ui_browser::cef_ui_browser(const std::string& url, const CefRefPtr<cef_ui_handler>& ui_handler)
+	cef_ui_browser::cef_ui_browser(const std::string& title, const std::string& url, const CefRefPtr<cef_ui_handler>& ui_handler)
 	{
-		CefWindowInfo window_info;
-		window_info.SetAsPopup(nullptr, "DesktopFrame");
-		window_info.bounds.width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-		window_info.bounds.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-		window_info.bounds.x = 0;
-		window_info.bounds.y = 0;
-		window_info.style = WS_VISIBLE | WS_POPUP;
+		CefWindowInfo window_info{};
+		window_info.SetAsPopup(nullptr, "");
+		ui_handler->fill_window_info(window_info);
+		CefString(&window_info.window_name) = title;
 
 		const CefBrowserSettings browser_settings{};
 		this->browser_ = CefBrowserHost::CreateBrowserSync(window_info, ui_handler, url,

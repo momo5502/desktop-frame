@@ -12,6 +12,8 @@ namespace cef
 
 		~cef_ui_wallpaper_handler() override;
 
+		void fill_window_info(CefWindowInfo& window_info) const override;
+
 		void OnDocumentAvailableInMainFrame(CefRefPtr<CefBrowser> browser) override;
 
 		void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
