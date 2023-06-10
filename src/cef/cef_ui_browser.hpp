@@ -27,6 +27,8 @@ namespace cef
 		void close_browser();
 		void reload_browser() const;
 
+		void navigate(const std::string& url);
+
 	private:
 		CefRefPtr<CefBrowser> browser_{};
 	};

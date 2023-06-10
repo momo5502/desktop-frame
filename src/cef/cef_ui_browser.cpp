@@ -69,9 +69,17 @@ namespace cef
 
 	void cef_ui_browser::reload_browser() const
 	{
-		if (this->browser_)
+		if (*this)
 		{
 			this->browser_->Reload();
+		}
+	}
+
+	void cef_ui_browser::navigate(const std::string& url)
+	{
+		if(*this)
+		{
+			this->browser_->GetMainFrame()->LoadURL(url);
 		}
 	}
 }
