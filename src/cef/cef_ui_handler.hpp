@@ -5,7 +5,7 @@
 namespace cef
 {
 	class cef_ui_handler : public CefClient, public CefDisplayHandler, public CefLifeSpanHandler, public CefLoadHandler,
-	                       public CefContextMenuHandler, CefRequestHandler
+	                       public CefContextMenuHandler, public CefRequestHandler
 	{
 	public:
 		explicit cef_ui_handler(cef_ui& ui);
@@ -41,12 +41,8 @@ namespace cef
 			return this;
 		}
 
-		void OnDocumentAvailableInMainFrame(CefRefPtr<CefBrowser> browser) override;
-
 		void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 		void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
-
-		bool DoClose(CefRefPtr<CefBrowser> browser) override;
 
 		void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
 		                         CefRefPtr<CefContextMenuParams> params,

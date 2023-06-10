@@ -1,3 +1,5 @@
+#pragma once
+
 namespace utils
 {
 	class desktop_window

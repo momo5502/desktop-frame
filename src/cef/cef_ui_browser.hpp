@@ -5,10 +5,12 @@
 
 namespace cef
 {
+	class cef_ui_handler;
+
 	class cef_ui_browser
 	{
 	public:
-		cef_ui_browser(cef_ui& ui, const std::string& url);
+		cef_ui_browser(const std::string& url, const CefRefPtr<cef_ui_handler>& ui_handler);
 		~cef_ui_browser();
 
 		cef_ui_browser(cef_ui_browser&&) = delete;

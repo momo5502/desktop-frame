@@ -7,31 +7,16 @@
 #include "cef/cef_ui.hpp"
 #include "cef/cef_ui_browser.hpp"
 
+#include "cef/cef_ui_wallpaper_handler.hpp"
 
 namespace
 {
 	void run(cef::cef_ui& ui)
 	{
-		utils::desktop_window desktop{};
-
 		cef::cef_ui_browser browser{
-			ui,
-			"https://www.youtube.com/embed/l40nk18GUzk?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1"
+			"https://www.youtube.com/embed/l40nk18GUzk?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1",
+			new cef::cef_ui_wallpaper_handler(ui)
 		};
-		desktop.apply(browser.get_window());
-
-
-		std::atomic_bool exit{false};
-		std::thread watcher([&]
-		{
-			const auto window = browser.get_window();
-			while (IsWindow(window) && !exit)
-			{
-				MoveWindow(window, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN),
-				           GetSystemMetrics(SM_CYVIRTUALSCREEN), true);
-				std::this_thread::sleep_for(10ms);
-			}
-		});
 
 		utils::system_tray tray("Desktop Frame");
 		{
@@ -52,9 +37,6 @@ namespace
 		}
 
 		ui.work();
-
-		exit = true;
-		watcher.join();
 	}
 
 	int main()

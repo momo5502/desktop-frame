@@ -5,7 +5,7 @@
 
 namespace cef
 {
-	cef_ui_browser::cef_ui_browser(cef_ui& ui, const std::string& url)
+	cef_ui_browser::cef_ui_browser(const std::string& url, const CefRefPtr<cef_ui_handler>& ui_handler)
 	{
 		CefWindowInfo window_info;
 		window_info.SetAsPopup(nullptr, "DesktopFrame");
@@ -16,7 +16,7 @@ namespace cef
 		window_info.style = WS_VISIBLE | WS_POPUP;
 
 		const CefBrowserSettings browser_settings{};
-		this->browser_ = CefBrowserHost::CreateBrowserSync(window_info, new cef_ui_handler(ui), url,
+		this->browser_ = CefBrowserHost::CreateBrowserSync(window_info, ui_handler, url,
 		                                                   browser_settings, {},
 		                                                   {});
 		if (!this->browser_)

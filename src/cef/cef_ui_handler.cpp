@@ -11,33 +11,16 @@ namespace cef
 	{
 	}
 
-	void cef_ui_handler::OnDocumentAvailableInMainFrame(const CefRefPtr<CefBrowser> browser)
-	{
-		std::ifstream t("C:/Users/mauri/Desktop/script.js");
-		const std::string str((std::istreambuf_iterator<char>(t)),
-		                      std::istreambuf_iterator<char>());
-
-		browser->GetMainFrame()->ExecuteJavaScript(str, "", 0);
-	}
-
 	void cef_ui_handler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 	{
-		CEF_REQUIRE_UI_THREAD();
+		CEF_REQUIRE_UI_THREAD()
 		this->ui_.add_browser(std::move(browser));
 	}
 
 	void cef_ui_handler::OnBeforeClose(const CefRefPtr<CefBrowser> browser)
 	{
-		CEF_REQUIRE_UI_THREAD();
-
-		SetParent(browser->GetHost()->GetWindowHandle(), nullptr);
+		CEF_REQUIRE_UI_THREAD()
 		this->ui_.remove_browser(browser);
-	}
-
-	bool cef_ui_handler::DoClose(const CefRefPtr<CefBrowser> browser)
-	{
-		SetParent(browser->GetHost()->GetWindowHandle(), nullptr);
-		return false;
 	}
 
 	void cef_ui_handler::OnBeforeContextMenu(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/,
