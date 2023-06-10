@@ -2,38 +2,45 @@
 
 #include "utils/nt.hpp"
 #include "utils/system_tray.hpp"
-#include "utils/desktop_window.hpp"
 
 #include "cef/cef_ui.hpp"
 #include "cef/cef_ui_browser.hpp"
 
+#include "cef/cef_ui_popup_handler.hpp"
 #include "cef/cef_ui_wallpaper_handler.hpp"
 
 namespace
 {
 	void run(cef::cef_ui& ui)
 	{
-		cef::cef_ui_browser browser{
+		cef::cef_ui_browser background{
 			"DesktopFrame",
 			"https://www.youtube.com/embed/l40nk18GUzk?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1",
 			new cef::cef_ui_wallpaper_handler(ui)
 		};
 
+		cef::cef_ui_browser popup{
+			"DesktopFrame",
+			"file:///C:/Users/mauri/source/repos/desktop-frame/app.html",
+			new cef::cef_ui_popup_handler(ui)
+		};
+
 		utils::system_tray tray("Desktop Frame");
 		{
-			tray.add_item("Inspect", []()
+			tray.add_item("Inspect", []
 			{
 				ShellExecuteA(nullptr, "open", "http://localhost:12345", nullptr, nullptr, SW_SHOWNORMAL);
 			});
 
-			tray.add_item("Reload", [&browser]
+			tray.add_item("Reload", [&background]
 			{
-				browser.reload_browser();
+				background.reload_browser();
 			});
 
-			tray.add_item("Exit", [&browser]
+			tray.add_item("Exit", [&background, &popup]
 			{
-				browser.close_browser();
+				popup.close_browser();
+				background.close_browser();
 			});
 		}
 

@@ -20,6 +20,8 @@ namespace cef
 
 		HWND get_window() const;
 
+		explicit operator bool() const;
+
 		void close_browser();
 		void reload_browser() const;
 

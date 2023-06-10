@@ -37,6 +37,11 @@ namespace cef
 		return this->browser_->GetHost()->GetWindowHandle();
 	}
 
+	cef_ui_browser::operator bool() const
+	{
+		return this->browser_.operator bool();
+	}
+
 	void cef_ui_browser::close_browser()
 	{
 		auto browser = this->browser_;
