@@ -14,7 +14,7 @@ function handleSizeChange() {
   console.log(window.innerWidth);
   console.log(window.innerHeight);
   document.body.style.transform = `scale(${scale})`;
-  document.body.style.filter = `saturate(1.1) blur(0px)`;
+ // document.body.style.filter = `saturate(1.5) blur(80px)`;
 }
 
 function injectStyles() {
@@ -90,7 +90,7 @@ function main() {
   window.addEventListener("resize", handleSizeChange);
   handleSizeChange();
 
-  injectStyles();
+  //injectStyles();
 }
 
 document.addEventListener("DOMContentLoaded", main);
