@@ -63,14 +63,14 @@ namespace
 			if (!popup)
 			{
 				popup = cef::cef_ui_browser("DesktopFrame",
-				                            "file:///C:/Users/mauri/Desktop/desktop-frame/app.html",
+				                            "https://momo/app.html",
 				                            new cef::cef_ui_popup_handler(ui));
 			}
 		};
 
 		utils::system_tray tray("Desktop Frame");
 		{
-			tray.add_item("Open Main", open_popup);
+			tray.add_item("Select Video", open_popup);
 
 			tray.add_item("Inspect", []
 			{

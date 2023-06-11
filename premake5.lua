@@ -100,7 +100,9 @@ workspace "desktopframe"
 		postbuildcommands {
 			"if not exist \"%{wks.location}runtime\" mkdir \"%{wks.location}runtime\"",
 			"if not exist \"%{wks.location}runtime\\%{cfg.buildcfg}\" mkdir \"%{wks.location}runtime\\%{cfg.buildcfg}\"",
+			"if not exist \"%{wks.location}runtime\\%{cfg.buildcfg}\\data\" mkdir \"%{wks.location}runtime\\%{cfg.buildcfg}\\data\"",
 			"copy /y \"$(TargetPath)\" \"%{wks.location}runtime\\%{cfg.buildcfg}\"",
+			"copy /y \"%{wks.location}..\\web\\*.*\" \"%{wks.location}runtime\\%{cfg.buildcfg}\\data\"",
 		}
 		
 		includedirs {

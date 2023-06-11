@@ -68,7 +68,7 @@ namespace cef
 			throw std::runtime_error("Failed to initialize CEF");
 		}
 
-		CefRegisterSchemeHandlerFactory("http", "momo", new cef_ui_scheme_handler_factory(this->command_handlers_));
+		CefRegisterSchemeHandlerFactory("https", "momo", new cef_ui_scheme_handler_factory(folder / "data", this->command_handlers_));
 	}
 
 	cef_ui::~cef_ui()

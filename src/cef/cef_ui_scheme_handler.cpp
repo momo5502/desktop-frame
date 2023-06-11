@@ -21,7 +21,7 @@ namespace cef
 			}
 
 			const auto mime_type = CefGetMimeType(extension);
-			if(!mime_type.empty())
+			if (!mime_type.empty())
 			{
 				return mime_type.ToString();
 			}
@@ -30,10 +30,10 @@ namespace cef
 		}
 	}
 
-	cef_ui_scheme_handler_factory::cef_ui_scheme_handler_factory(/*std::filesystem::path folder,*/
+	cef_ui_scheme_handler_factory::cef_ui_scheme_handler_factory(std::filesystem::path folder,
 	                                                             const command_handlers& command_handlers)
-		: /*folder_(std::move(folder))
-		  ,*/ command_handlers_(command_handlers)
+		: folder_(std::move(folder))
+		  , command_handlers_(command_handlers)
 	{
 	}
 
@@ -47,13 +47,13 @@ namespace cef
 		CefURLParts url_parts{};
 		CefParseURL(request->GetURL(), url_parts);
 
-		const auto path = CefString(&url_parts.path).ToString();
+		auto path = CefString(&url_parts.path).ToString();
 		auto* const result = this->handle_command(request, path);
 		if (result)
 		{
 			return result;
 		}
-		/*/
+
 		// Prevents files starting with a / from interacting badly with std::filesystem::path / concatenation
 		while (path[0] == '/')
 		{
@@ -69,8 +69,7 @@ namespace cef
 			return new CefStreamResourceHandler(mime_type, stream);
 		}
 
-		throw std::runtime_error("Could not read file at " + file.string()); */
-		throw std::runtime_error("Could not read file");
+		throw std::runtime_error("Could not read file at " + file.string());
 	}
 
 	CefResourceHandler* cef_ui_scheme_handler_factory::handle_command(const CefRefPtr<CefRequest>& request,
@@ -102,7 +101,7 @@ namespace cef
 
 		if (command.IsString())
 		{
-			auto command_name = std::string{ command.GetString(), command.GetStringLength() };
+			auto command_name = std::string{command.GetString(), command.GetStringLength()};
 			const auto handler = this->command_handlers_.find(command_name);
 			if (handler != this->command_handlers_.end())
 			{

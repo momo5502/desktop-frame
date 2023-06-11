@@ -24,7 +24,13 @@ namespace cef
 		const std::string str((std::istreambuf_iterator<char>(t)),
 		                      std::istreambuf_iterator<char>());
 
-		browser->GetMainFrame()->ExecuteJavaScript(str, "", 0);
+		browser->GetMainFrame()->ExecuteJavaScript(R"code(
+(function () {
+  var script = document.createElement('script');
+  script.src = "https://momo/script.js";
+  document.head.appendChild(script);
+})();
+)code", "", 0);
 	}
 
 	void cef_ui_wallpaper_handler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
