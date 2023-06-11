@@ -25,7 +25,7 @@ namespace
 			if (!popup)
 			{
 				popup = cef::cef_ui_browser("DesktopFrame",
-				                            "file:///C:/Users/mauri/Desktop/desktop-frame/app.html",
+				                            "file:///C:/Users/mauri/source/repos/desktop-frame/app.html",
 				                            new cef::cef_ui_popup_handler(ui));
 			}
 		};
