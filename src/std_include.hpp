@@ -17,8 +17,12 @@
 #include <regex>
 #include <atomic>
 #include <set>
-
+#include <filesystem>
 #include <optional>
+
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
 
 using namespace std::literals;
 

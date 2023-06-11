@@ -2,8 +2,9 @@
 
 #include "utils/nt.hpp"
 
-#include "cef/cef_ui.hpp"
-#include "cef/cef_ui_app.hpp"
+#include "cef_ui.hpp"
+#include "cef_ui_app.hpp"
+#include "cef_ui_scheme_handler.hpp"
 
 namespace cef
 {
@@ -66,6 +67,8 @@ namespace cef
 		{
 			throw std::runtime_error("Failed to initialize CEF");
 		}
+
+		CefRegisterSchemeHandlerFactory("http", "momo", new cef_ui_scheme_handler_factory(this->command_handlers_));
 	}
 
 	cef_ui::~cef_ui()
@@ -98,6 +101,11 @@ namespace cef
 		}
 
 		return {};
+	}
+
+	void cef_ui::add_command(std::string command, command_handler handler)
+	{
+		this->command_handlers_[std::move(command)] = std::move(handler);
 	}
 
 	void cef_ui::add_browser(CefRefPtr<CefBrowser> browser)
