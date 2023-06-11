@@ -7,12 +7,23 @@
         color: #f0f0f0;
       }
 
+      html,
+      body {
+        height: 100vh;
+        width: 100vw;
+        max-height: 100vh;
+        max-width: 100vw;
+        overflow: hidden;
+      }
+
       /* CSS for overall layout */
       body {
         background-color: #000;
         margin: 0;
         padding: 0;
         font-family: "Segoe UI Light", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
       }
 
       /* CSS for grain background */
@@ -55,23 +66,26 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add drop shadow */
       }
 
+      .navbar * {
+        flex: 1;
+      }
+
       .navbar-brand {
         font-size: 20px;
         font-weight: bold;
         text-decoration: none;
-        margin-right: auto;
       }
 
       .navbar-settings {
         font-size: 20px;
-        margin-left: 10px;
+        text-align: right;
       }
 
       .navbar-search {
         text-align: center;
         border-radius: 7px; /* Add rounded corners */
         overflow: hidden; /* Ensure rounded corners are applied */
-        width: 50%;
+        flex: 2;
       }
 
       .search-input {
@@ -80,6 +94,7 @@
         padding: 8px;
         border-radius: 7px; /* Reduce border radius */
         width: 100%;
+        outline: 0;
       }
 
       /* CSS for grid layout */
@@ -91,6 +106,7 @@
         ); /* Adjust the minimum width of thumbnails */
         grid-gap: 20px; /* Increase spacing between thumbnails */
         padding: 20px;
+        overflow-y: auto;
       }
 
       /* CSS for video container */
@@ -300,9 +316,32 @@
         },
       ];
 
+      function search(search_query) {
+        const API_KEY = "AIzaSyCVbV-FwfOE21Ri9wcJAqrwjjSPNKwY1jQ";
+        const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&maxResults=20&part=snippet&q=${encodeURI(
+          search_query
+        )}`;
+
+        return fetch(url).then((data) => data.json());
+      }
+
+      function getVideos(query) {
+        return search(query).then((data) =>
+          data.items
+            .map((item) => {
+              return {
+                id: item.id.videoId,
+                title: item.snippet.title,
+              };
+            })
+            .filter((item) => item.id !== undefined)
+        );
+      }
+
       // Generate thumbnails dynamically
-      function generateThumbnails() {
+      function generateThumbnails(videoData) {
         var grid = document.getElementById("video-grid");
+        grid.innerHTML = "";
         for (var i = 0; i < videoData.length; i++) {
           var videoContainer = document.createElement("div");
           videoContainer.className = "video-container";
@@ -321,6 +360,12 @@
           videoContainer.appendChild(thumbnail);
           grid.appendChild(videoContainer);
         }
+      }
+
+      function displayVideoSearch(query) {
+        return getVideos(query).then((data) => {
+          generateThumbnails(data);
+        });
       }
 
       // Open video popup
@@ -345,12 +390,23 @@
         videoPopup.classList.remove("active");
       }
 
-      // Generate thumbnails on page load
-      generateThumbnails();
+      function triggerSearch(e) {
+        if (window.searchTimeout) {
+          clearTimeout(window.searchTimeout);
+        }
+
+        window.searchTimeout = setTimeout(() => {
+          window.searchTimeout = undefined;
+          displayVideoSearch(this.value);
+        }, 300);
+      }
 
       // Close video popup when close button is clicked
       var videoPopupClose = document.querySelector(".video-popup-close");
       videoPopupClose.addEventListener("click", closeVideoPopup);
+
+      var searchInput = document.querySelector(".search-input");
+      searchInput.addEventListener("input", triggerSearch);
 
       window.executeNativeCommand = function (command, data) {
         var object = {
