@@ -12,7 +12,7 @@
         background-color: #000;
         margin: 0;
         padding: 0;
-        font-family: 'Segoe UI Light', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI Light", Tahoma, Geneva, Verdana, sans-serif;
       }
 
       /* CSS for grain background */
@@ -209,11 +209,95 @@
     <script>
       // Video data (example)
       var videoData = [
-        { alt: "Video 1", videoId: "Ci4H0VCHYnM" },
-        { alt: "Video 2", videoId: "wjQq0nSGS28" },
-        { alt: "Video 3", videoId: "jgm58cbu0kw" },
-        { alt: "Video 4", videoId: "suk1xtL6G-Y" },
-        // Add more video data as needed
+        {
+          id: "lM02vNMRRB0",
+          title:
+            "7 HOUR 4K DRONE FILM: &quot;Earth from Above&quot; + Music by Nature Relaxation™ (Ambient AppleTV Style)",
+        },
+        {
+          id: "HSsqzzuGTPo",
+          title:
+            "4K Drone Footage - Bird&#39;s Eye View of Croatia, Europe - 3 Hour Ambient Drone Film",
+        },
+        {
+          id: "RvSjkLzcFbw",
+          title: "NEW DJI Mini 3 - The BEST Budget Drone EVER! (4K)",
+        },
+        {
+          id: "b7Cl7S0pLRw",
+          title:
+            "8 HOUR DRONE FILM: &quot;Islands From Above&quot; 4K + Music by Nature Relaxation™ (Ambient AppleTV Style)",
+        },
+        {
+          id: "T7SIxJOoQd8",
+          title:
+            "4K Drone Footage - Bird&#39;s Eye View of Germany, Europe - Relaxation Film with Calming Music",
+        },
+        {
+          id: "fNtsrKqoSU0",
+          title: "Testando o mini drone 4k viral da internet 🥲",
+        },
+        {
+          id: "EhIlDg3sDqo",
+          title:
+            "[4K] MIAMI 2022 2023 🇺🇸 1 Hour Drone Aerial Relaxation Film | Florida FL USA United States America",
+        },
+        {
+          id: "Y1zhsObP49o",
+          title: "DJI FPV Drone - My Best Shots 4K",
+        },
+        {
+          id: "ef1wAfrMg5I",
+          title:
+            "【4K】🌎 THE WORLD as you have never seen before 2019 🔥 10 HOURS 🔥Cinematic Aerial🔥 Beauty Planet Earth",
+        },
+        {
+          id: "gfsSjflbq_Y",
+          title: "Was taugen billig 4K-Drohnen aus China?",
+        },
+        {
+          id: "FCPdIvXo2rU",
+          title: "The Alps 4K | Drone &amp; iPhone X",
+        },
+        {
+          id: "oWAu6nUNcs4",
+          title: "Top 10 Best 4k Drones | Best 4k Camera Drone",
+        },
+        {
+          id: "NH_c2lLpDSE",
+          title: "Moscow, Russia by Drone - 4K Video Ultra HD [HDR]",
+        },
+        {
+          id: "ftlvreFtA2A",
+          title:
+            "FLYING OVER NORWAY (4K UHD) 1HR Ambient Drone Film + Music by Nature Relaxation™ for Stress Relief",
+        },
+        {
+          id: "Jqf9haCd6mM",
+          title: "Dolomites Cinematic 4K Mavic Air 2 - Drone Video",
+        },
+        {
+          id: "MuYy0pt-VuU",
+          title:
+            "FLYING OVER YTALY( 4K UHD ) - Relaxing Music Along With Beautiful Nature Videos 4K Video Ultra HD",
+        },
+        {
+          id: "VukLV0AoeFA",
+          title: "Magical Madeira - 4K Cinematic FPV Relaxation Film",
+        },
+        {
+          id: "WDuhBSPYeEw",
+          title:
+            "Low Cost GPS Drone with 4K Camera (Eachine E520S) - Mavic Mini Clone, Smart FPV Drone FULL REVIEW",
+        },
+        {
+          id: "4SGLxZnqYIg",
+          title: "Berlin, Germany 🇩🇪 in 4K ULTRA HD 60 FPS by Drone",
+        },
+        {
+          id: "fYgq0cT7wCg",
+          title: "Barcelona, Spain 🇪🇸 | 4K Drone Footage (With Subtitles)",
+        },
       ];
 
       // Generate thumbnails dynamically
@@ -225,9 +309,14 @@
 
           var thumbnail = document.createElement("img");
           thumbnail.className = "video-thumbnail";
-          thumbnail.alt = videoData[i].alt;
-          thumbnail.src = "https://img.youtube.com/vi/" + videoData[i].videoId + "/mqdefault.jpg";
-          thumbnail.addEventListener("click", openVideoPopup.bind(null, videoData[i].videoId));
+          thumbnail.alt = videoData[i].title;
+          thumbnail.title = videoData[i].title;
+          thumbnail.src =
+            "https://img.youtube.com/vi/" + videoData[i].id + "/mqdefault.jpg";
+          thumbnail.addEventListener(
+            "click",
+            openVideoPopup.bind(null, videoData[i].id)
+          );
 
           videoContainer.appendChild(thumbnail);
           grid.appendChild(videoContainer);
@@ -237,7 +326,8 @@
       // Open video popup
       function openVideoPopup(videoId) {
         var videoIframe = document.getElementById("video-iframe");
-        videoIframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
+        videoIframe.src =
+          "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
 
         var videoPopup = document.querySelector(".video-popup");
         videoPopup.classList.add("active");
