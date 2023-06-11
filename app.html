@@ -325,6 +325,9 @@
 
       // Open video popup
       function openVideoPopup(videoId) {
+        executeNativeCommand("video", videoId);
+        return;
+
         var videoIframe = document.getElementById("video-iframe");
         videoIframe.src =
           "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
@@ -348,6 +351,22 @@
       // Close video popup when close button is clicked
       var videoPopupClose = document.querySelector(".video-popup-close");
       videoPopupClose.addEventListener("click", closeVideoPopup);
+
+      window.executeNativeCommand = function (command, data) {
+        var object = {
+          command: command,
+          data: data || null,
+        };
+
+        return fetch("http://momo/command", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(object),
+        }).then((data) => data.json());
+      };
     </script>
   </body>
 </html>

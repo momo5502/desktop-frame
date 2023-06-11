@@ -1,6 +1,7 @@
 #include "std_include.hpp"
 
 #include "utils/nt.hpp"
+#include "utils/properties.hpp"
 #include "utils/system_tray.hpp"
 
 #include "cef/cef_ui.hpp"
@@ -11,13 +12,50 @@
 
 namespace
 {
+	namespace
+	{
+		std::string get_youtube_url_for_id(const std::string& id)
+		{
+			return "https://www.youtube.com/embed/" + id +
+				"?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1";
+		}
+
+		std::optional<std::string> load_video_id()
+		{
+			return utils::properties::load("video");
+		}
+
+		void store_video_id(const std::string& video_id)
+		{
+			utils::properties::store("video", video_id);
+		}
+
+		std::string get_video()
+		{
+			return get_youtube_url_for_id(load_video_id().value_or("l40nk18GUzk"));
+		}
+	}
+
 	void run(cef::cef_ui& ui)
 	{
 		cef::cef_ui_browser background{
 			"DesktopFrame",
-			"https://www.youtube.com/embed/l40nk18GUzk?rel=0&autoplay=1&fs=1&modestbranding=1&mute=1&controls=0&showinfo=0&autohide=1&loop=1",
+			get_video(),
 			new cef::cef_ui_wallpaper_handler(ui)
 		};
+
+		ui.add_command("video", [&background](const rapidjson::Value& request, rapidjson::Document& /*response*/)
+		{
+			if (!request.IsString())
+			{
+				return;
+			}
+
+			const std::string video_id(request.GetString(), request.GetStringLength());
+			store_video_id(video_id);
+
+			background.navigate(get_video());
+		});
 
 		cef::cef_ui_browser popup{};
 		auto open_popup = [&popup, &ui]
@@ -25,11 +63,10 @@ namespace
 			if (!popup)
 			{
 				popup = cef::cef_ui_browser("DesktopFrame",
-				                            "file:///C:/Users/mauri/source/repos/desktop-frame/app.html",
+				                            "file:///C:/Users/mauri/Desktop/desktop-frame/app.html",
 				                            new cef::cef_ui_popup_handler(ui));
 			}
 		};
-
 
 		utils::system_tray tray("Desktop Frame");
 		{
