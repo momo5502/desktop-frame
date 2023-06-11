@@ -1,3 +1,5 @@
+(function() {
+
 function handleSizeChange() {
   const video = document.querySelector("video");
 
@@ -93,4 +95,6 @@ function main() {
   //injectStyles();
 }
 
-document.addEventListener("DOMContentLoaded", main);
+main();
+
+})();
