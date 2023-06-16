@@ -48,7 +48,7 @@ namespace cef
 		this->stop_watcher();
 
 		SetParent(browser->GetHost()->GetWindowHandle(), nullptr);
-		return cef_ui_handler::DoClose(browser);
+		return cef_ui_handler::DoClose(std::move(browser));
 	}
 
 	void cef_ui_wallpaper_handler::stop_watcher()
