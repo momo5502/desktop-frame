@@ -9,6 +9,7 @@
 
 #include "cef/cef_ui_popup_handler.hpp"
 #include "cef/cef_ui_wallpaper_handler.hpp"
+#include "cef/cef_ui_lockscreen_handler.hpp"
 
 namespace
 {
@@ -41,7 +42,7 @@ namespace
 		cef::cef_ui_browser background{
 			"DesktopFrame",
 			get_video(),
-			new cef::cef_ui_wallpaper_handler(ui)
+			new cef::cef_ui_lockscreen_handler(ui)
 		};
 
 		ui.add_command("video", [&background](const rapidjson::Value& request, rapidjson::Document& /*response*/)
